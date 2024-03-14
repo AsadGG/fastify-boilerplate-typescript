@@ -19,7 +19,7 @@ export default async function (
 ) {
   const frequencySpec = parseFrequency(frequency);
 
-  let number = await detectLastNumber(file, frequencySpec?.start);
+  let number = await detectLastNumber(file, frequencySpec.start);
 
   let currentSize = 0;
   const maxSize = parseSize(size);
@@ -54,14 +54,11 @@ export default async function (
 
   function scheduleRoll() {
     clearTimeout(rollTimeout);
-    rollTimeout = setTimeout(
-      () => {
-        roll();
-        frequencySpec.next = getNext(frequency);
-        scheduleRoll();
-      },
-      (frequencySpec?.next ?? 0) - Date.now()
-    );
+    rollTimeout = setTimeout(() => {
+      roll();
+      frequencySpec.next = getNext(frequency);
+      scheduleRoll();
+    }, frequencySpec.next - Date.now());
   }
 
   return destination;
@@ -137,14 +134,16 @@ function parseFrequency(frequency: 'daily' | 'hourly' | number) {
     return { frequency, start, next: getNextHour(start) };
   }
   if (typeof frequency === 'number') {
-    return { frequency, next: getNextCustom(frequency) };
+    const start = 0;
+    return { frequency, start, next: getNextCustom(frequency) };
   }
   if (frequency) {
     throw new Error(
       `${frequency} is neither a supported frequency or a number of milliseconds`
     );
   }
-  return {};
+  const start = 0;
+  return { frequency, start, next: 0 };
 }
 
 async function isMatchingTime(filePath: PathLike, time: number) {
@@ -157,7 +156,7 @@ function extractTrailingNumber(fileName: string) {
   return match ? +match[1] : null;
 }
 
-async function readFileTrailingNumbers(folder: string, time: number | null) {
+async function readFileTrailingNumbers(folder: string, time: number) {
   const numbers = [1];
   for (const file of await readdir(folder)) {
     if (time && !(await isMatchingTime(join(folder, file), time))) {
@@ -171,7 +170,7 @@ async function readFileTrailingNumbers(folder: string, time: number | null) {
   return numbers;
 }
 
-async function detectLastNumber(fileName: string, time: number | null = null) {
+async function detectLastNumber(fileName: string, time: number = 0) {
   try {
     const numbers = await readFileTrailingNumbers(dirname(fileName), time);
     return numbers.sort((a, b) => b - a)[0];

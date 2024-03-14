@@ -5,9 +5,7 @@ import path from 'path';
 import { LoggerOptions, pino } from 'pino';
 import { GLOBAL_CONSTANTS } from '../../global-constants.js';
 
-type LoggerType = 'APP_LOGGER' | 'USER_LOGGER' | 'ADMIN_LOGGER';
-
-function createLogger(moduleName: LoggerType) {
+export function createLogger(moduleName: string) {
   const logFolderPath = path.join(GLOBAL_CONSTANTS.ROOT_PATH, 'logs');
   const logFilePath = path.join(logFolderPath, `${kebabCase(moduleName)}`);
 
@@ -66,7 +64,3 @@ function createLogger(moduleName: LoggerType) {
 
   return pino(pinoOptions);
 }
-
-export const appLogger = createLogger('APP_LOGGER');
-export const adminLogger = createLogger('ADMIN_LOGGER');
-export const userLogger = createLogger('USER_LOGGER');

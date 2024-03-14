@@ -1,81 +1,78 @@
-import { Static } from '@sinclair/typebox';
-import { FastifyInstance } from 'fastify';
-import { REDIS_KEYS } from '../../../../config/constants.js';
-import { userLogger } from '../../../../config/logger.js';
+'use strict';
+
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import HTTP_STATUS from '../../../../utilities/http-status.js';
 import { promiseHandler } from '../../../../utilities/promise-handler.js';
-import { getUserSchema, setUserSchema } from './schema.js';
+import model from './_model.js';
+import schema, {
+  type UserGetQueryStringType,
+  type UserPostBodyType,
+} from './_schema.js';
 
-type SetUserBodyType = Static<typeof setUserSchema.body>;
-
-export default async function (fastify: FastifyInstance) {
-  fastify.addHook('onRequest', function (request, reply, done) {
-    request.log = userLogger;
-    request.log.info({ request: request.raw, reply: reply.raw });
-    done();
-  });
-
-  fastify.get(
-    '/',
-    {
-      schema: getUserSchema,
-    },
-    async function (request, reply) {
-      request.log.info({
-        message: `Handling GET ${request.url} request`,
-      });
-      const redisGetPromise = fastify.redis.get(REDIS_KEYS.USER);
-      const [redisGetResult, redisGetError] =
-        await promiseHandler(redisGetPromise);
-      if (!redisGetResult) {
-        request.log.error({
-          message: `User Value Does Not Exist`,
-          error: redisGetError,
-        });
-        return reply.status(404).send({
-          statusCode: 404,
-          error: 'Not Found',
-          message: `User Value Does Not Exist`,
+export function GET(fastify: FastifyInstance) {
+  return {
+    schema: schema.USER.GET,
+    handler: async function (
+      request: FastifyRequest<{
+        Querystring: UserGetQueryStringType;
+      }>,
+      reply: FastifyReply
+    ) {
+      const data = {
+        params: request.params,
+        query: request.query,
+        body: request.body,
+        user: request.user,
+      };
+      const promise = model.USER.GET(fastify.knex, data);
+      const [result, error] = await promiseHandler(promise);
+      if (!result) {
+        request.log.error(error);
+        return reply.status(HTTP_STATUS.BAD_REQUEST).send({
+          statusCode: HTTP_STATUS.BAD_REQUEST,
+          message: error.detail ?? error.message,
         });
       }
-      return reply.status(200).send({
-        statusCode: 200,
-        message: `User Value Found`,
-        data: redisGetResult,
+      return reply.status(HTTP_STATUS.OK).send({
+        statusCode: HTTP_STATUS.OK,
+        message: 'users fetched successfully.',
+        data: result,
       });
-    }
-  );
-
-  fastify.post<{ Body: SetUserBodyType }>(
-    '/',
-    {
-      schema: setUserSchema,
     },
-    async function (request, reply) {
-      request.log.info({
-        message: `Handling POST ${request.url} request`,
-        payload: request.body,
-      });
-      const redisSetPromise = fastify.redis.set(
-        REDIS_KEYS.USER,
-        request.body.name
-      );
-      const [redisSetResult, redisSetError] =
-        await promiseHandler(redisSetPromise);
-      if (!redisSetResult) {
-        request.log.error({
-          message: `Could Not Set Value In Redis`,
-          error: redisSetError,
-        });
-        return reply.status(500).send({
-          statusCode: 500,
-          error: `Something Went Wrong`,
-          message: `Could Not Set User Value In Redis`,
+  };
+}
+
+export function POST(fastify: FastifyInstance) {
+  return {
+    schema: schema.USER.POST,
+    handler: async function (
+      request: FastifyRequest<{ Body: UserPostBodyType }>,
+      reply: FastifyReply
+    ) {
+      const password = request.body.password;
+      const hashedPassword = await fastify.bcrypt.hash(password);
+      request.body.password = hashedPassword;
+      const data = {
+        params: request.params,
+        query: request.query,
+        body: request.body,
+        user: request.user,
+      };
+      const promise = model.USER.POST(fastify.knex, data);
+      const [result, error] = await promiseHandler(promise);
+      if (!result) {
+        request.log.error(error);
+        return reply.status(HTTP_STATUS.BAD_REQUEST).send({
+          statusCode: HTTP_STATUS.BAD_REQUEST,
+          message: error.detail ?? error.message,
         });
       }
-      return reply.status(200).send({
-        statusCode: 200,
-        message: `User Value Has Been Set In Redis`,
+
+      return reply.status(HTTP_STATUS.OK).send({
+        statusCode: HTTP_STATUS.OK,
+        message: 'User has been successfully created.',
+        data: result,
       });
-    }
-  );
+    },
+  };
 }
