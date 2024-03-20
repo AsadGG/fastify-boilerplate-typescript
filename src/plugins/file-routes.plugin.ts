@@ -17,6 +17,10 @@ const methods = [
 
 const extensions = ['.ts'];
 
+type Module = {
+  [functionName in (typeof methods)[number]]: (fastify: FastifyInstance) => any;
+};
+
 function isRoute(extension: string) {
   return extensions.includes(extension);
 }
@@ -32,7 +36,7 @@ function shouldIgnore(name: string) {
 }
 
 async function addRequestHandler(
-  module: any, // temp
+  module: Module,
   method: (typeof methods)[number],
   server: FastifyInstance,
   fileRouteServerPath: string
