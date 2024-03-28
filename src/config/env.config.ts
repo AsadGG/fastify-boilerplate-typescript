@@ -9,14 +9,7 @@ const ENV_SCHEMA = Type.Object({
   WEB_SERVER_PROTOCOL: Type.String(),
   WEB_SERVER_HOST: Type.String(),
 
-  DB_HOST: Type.String(),
-  DB_PORT: Type.Integer({
-    maximum: 65535,
-    minimum: 1000,
-  }),
-  DB_USER: Type.String(),
-  DB_PASSWORD: Type.String(),
-  DATABASE: Type.String(),
+  DATABASE_URL: Type.String(),
 
   JWT_SECRET: Type.String(),
 

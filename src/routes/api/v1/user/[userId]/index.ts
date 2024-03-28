@@ -20,7 +20,7 @@ export function GET(fastify: FastifyInstance) {
       reply: FastifyReply
     ) {
       const promise = fastify.kysely
-        .selectFrom('users')
+        .selectFrom('user')
         .selectAll()
         .where('id', '=', request.params.userId)
         .executeTakeFirst();
@@ -62,7 +62,7 @@ export function PATCH(fastify: FastifyInstance) {
       reply: FastifyReply
     ) {
       const promise = fastify.kysely
-        .updateTable('users')
+        .updateTable('user')
         .set({
           firstName: request.body.firstName,
           lastName: request.body.lastName,
@@ -111,7 +111,7 @@ export function DELETE(fastify: FastifyInstance) {
       reply: FastifyReply
     ) {
       const promise = fastify.kysely
-        .deleteFrom('users')
+        .deleteFrom('user')
         .where('id', '=', request.params.userId)
         .executeTakeFirst();
 

@@ -25,9 +25,9 @@ export function GET(fastify: FastifyInstance) {
       function searchFilter(
         searchText: string
       ): (
-        eb: ExpressionBuilder<DB, 'users'>
-      ) => ExpressionWrapper<DB, 'users', SqlBool> {
-        return function (eb: ExpressionBuilder<DB, 'users'>) {
+        eb: ExpressionBuilder<DB, 'user'>
+      ) => ExpressionWrapper<DB, 'user', SqlBool> {
+        return function (eb: ExpressionBuilder<DB, 'user'>) {
           return eb.or([
             eb('firstName', 'ilike', `%${searchText}%`),
             eb('lastName', 'ilike', `%${searchText}%`),
@@ -38,7 +38,7 @@ export function GET(fastify: FastifyInstance) {
       }
 
       let usersQuery = fastify.kysely
-        .selectFrom('users')
+        .selectFrom('user')
         .selectAll()
         .limit(limit)
         .offset(offset);
@@ -52,7 +52,7 @@ export function GET(fastify: FastifyInstance) {
       const userPromise = usersQuery.execute();
 
       let usersCountQuery = fastify.kysely
-        .selectFrom('users')
+        .selectFrom('user')
         .select((eb) => eb.fn.countAll().as('count'));
 
       if (searchText) {
@@ -110,7 +110,7 @@ export function POST(fastify: FastifyInstance) {
       request.body.password = hashedPassword;
 
       const promise = fastify.kysely
-        .insertInto('users')
+        .insertInto('user')
         .values(request.body)
         .returningAll()
         .execute();

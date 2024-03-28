@@ -10,11 +10,7 @@ declare module 'fastify' {
 
 function kyselyConfig(config: ENVSchemaType) {
   return {
-    host: config.DB_HOST,
-    port: config.DB_PORT,
-    user: config.DB_USER,
-    password: config.DB_PASSWORD,
-    database: config.DATABASE,
+    connectionString: config.DATABASE_URL,
     max: 10,
   };
 }

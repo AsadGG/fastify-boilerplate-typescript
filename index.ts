@@ -9,7 +9,6 @@ import { bcryptConfig } from './src/config/bcrypt.config.js';
 import envConfig from './src/config/env.config.js';
 import { fileRoutesConfig } from './src/config/file-routes.config.js';
 import { JWTConfig } from './src/config/jwt.config.js';
-import knexConfig from './src/config/knex.config.js';
 import kyselyConfig from './src/config/kysely.config.js';
 import { loggerConfig } from './src/config/logger.config.js';
 import { multipartConfig } from './src/config/multipart.config.js';
@@ -17,7 +16,6 @@ import { redisConfig } from './src/config/redis.config.js';
 import { createLogger } from './src/logger/logger.js';
 import fileRoutes from './src/plugins/file-routes.plugin.js';
 import fastifyJWT from './src/plugins/jwt.plugin.js';
-import fastifyKnex from './src/plugins/knex.plugin.js';
 import fastifyKysely from './src/plugins/kysely.plugin.js';
 import fastifyLogger from './src/plugins/logger.plugin.js';
 
@@ -41,8 +39,6 @@ const server = fastify({
 });
 
 await server.register(fastifyEnv, envConfig());
-
-await server.register(fastifyKnex, knexConfig(server.config));
 
 await server.register(fastifyKysely, kyselyConfig(server.config));
 
