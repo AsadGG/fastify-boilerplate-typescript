@@ -37,7 +37,7 @@ async function rollbackMigration() {
     }
   }
 
-  const { error: toError, results: toResults } =
+  const { error: toError, results: _toResults } =
     await migrator.migrateTo(nameArgument);
 
   if (toError) {
