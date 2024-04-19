@@ -11,9 +11,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('email', 'text', (col) => col.notNull())
     .addColumn('password', 'text', (col) => col.notNull())
     .addColumn('is_active', 'boolean', (col) => col.defaultTo(false).notNull())
-    .addColumn('amount', 'decimal(10, 2)', (col) =>
-      col.defaultTo(0).unique().notNull()
-    )
+    .addColumn('is_deleted', 'boolean', (col) => col.defaultTo(false).notNull())
     .addColumn('phone', 'text', (col) => col.notNull())
     .addColumn('created_at', 'timestamp', (col) =>
       col.defaultTo(sql`now()`).notNull()

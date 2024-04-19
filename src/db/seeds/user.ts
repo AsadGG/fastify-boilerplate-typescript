@@ -19,7 +19,6 @@ async function createRandomUser() {
     email: email,
     password: password,
     isActive: true,
-    amount: faker.finance.amount({ min: 1_000, max: 10_000_000 }),
     phone: faker.phone.number(),
   };
 }

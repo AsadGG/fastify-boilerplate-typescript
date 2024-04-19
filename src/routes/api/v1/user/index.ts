@@ -115,9 +115,9 @@ export function POST(fastify: FastifyInstance) {
         .returningAll()
         .execute();
 
-      const [result, error] = await promiseHandler(promise);
+      const [result, error, ok] = await promiseHandler(promise);
 
-      if (!result) {
+      if (!ok) {
         request.log.error(error);
         return reply.status(HTTP_STATUS.BAD_REQUEST).send({
           statusCode: HTTP_STATUS.BAD_REQUEST,

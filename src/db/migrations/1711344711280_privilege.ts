@@ -2,25 +2,19 @@ import { Kysely, sql } from 'kysely';
 
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
-    .createType('permission_type')
+    .createType('privilege_type')
     .asEnum(['Frontend', 'Backend', 'Hybrid'])
     .execute();
 
   await db.schema
-    .createTable('permission')
+    .createTable('privilege')
     .addColumn('id', 'uuid', (col) =>
       col.primaryKey().defaultTo(sql`gen_random_uuid()`)
     )
     .addColumn('name', 'text', (col) => col.notNull())
     .addColumn('description', 'text', (col) => col.notNull())
-    .addColumn('permission_sequence', 'text', (col) => col.notNull())
-    .addColumn('permission_parent', 'text', (col) => col.notNull())
-    .addColumn('action', 'text', (col) => col.notNull())
-    .addColumn('show_on_menu', 'boolean', (col) =>
-      col.defaultTo(false).notNull()
-    )
-    .addColumn('is_active', 'boolean', (col) => col.defaultTo(false).notNull())
-    .addColumn('permission_type', sql`permission_type`, (col) =>
+    .addColumn('is_deleted', 'boolean', (col) => col.defaultTo(false).notNull())
+    .addColumn('privilege_type', sql`privilege_type`, (col) =>
       col.defaultTo('Frontend')
     )
     .addColumn('created_at', 'timestamp', (col) =>
@@ -34,13 +28,13 @@ export async function up(db: Kysely<any>): Promise<void> {
   await sql`
     CREATE TRIGGER update_timestamp
     BEFORE UPDATE
-    ON ${sql.table('permission')}
+    ON ${sql.table('privilege')}
     FOR EACH ROW
     EXECUTE PROCEDURE update_timestamp()`.execute(db);
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
-  await db.schema.dropTable('permission').execute();
+  await db.schema.dropTable('privilege').execute();
 
-  await db.schema.dropType('permission_type').ifExists().execute();
+  await db.schema.dropType('privilege_type').ifExists().execute();
 }

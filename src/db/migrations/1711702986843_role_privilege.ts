@@ -2,29 +2,31 @@ import { Kysely, sql } from 'kysely';
 
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
-    .createTable('role')
-    .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_random_uuid()`)
+    .createTable('role_privilege')
+    .addColumn('role_id', 'uuid', (col) => col.references('role.id').notNull())
+    .addColumn('privilege_id', 'uuid', (col) =>
+      col.references('privilege.id').notNull()
     )
-    .addColumn('name', 'text', (col) => col.notNull())
-    .addColumn('description', 'text', (col) => col.notNull())
-    .addColumn('is_deleted', 'boolean', (col) => col.defaultTo(false).notNull())
     .addColumn('created_at', 'timestamp', (col) =>
       col.defaultTo(sql`now()`).notNull()
     )
     .addColumn('updated_at', 'timestamp', (col) =>
       col.defaultTo(sql`now()`).notNull()
     )
+    .addPrimaryKeyConstraint('role_privilege_primary_key', [
+      'role_id',
+      'privilege_id',
+    ])
     .execute();
 
   await sql`
     CREATE TRIGGER update_timestamp
     BEFORE UPDATE
-    ON ${sql.table('role')}
+    ON ${sql.table('role_privilege')}
     FOR EACH ROW
     EXECUTE PROCEDURE update_timestamp()`.execute(db);
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
-  await db.schema.dropTable('role').execute();
+  await db.schema.dropTable('role_privilege').execute();
 }

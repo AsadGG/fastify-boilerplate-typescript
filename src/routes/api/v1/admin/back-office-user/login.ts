@@ -22,8 +22,8 @@ export function POST(fastify: FastifyInstance) {
         user: request.user,
       };
       const promise = model.LOGIN.POST(fastify.knex, data);
-      const [result, error] = await promiseHandler(promise);
-      if (!result) {
+      const [result, error, ok] = await promiseHandler(promise);
+      if (!ok) {
         request.log.error(error);
         return reply.status(HTTP_STATUS.BAD_REQUEST).send({
           statusCode: HTTP_STATUS.BAD_REQUEST,
