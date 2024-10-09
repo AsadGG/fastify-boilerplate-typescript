@@ -8,16 +8,30 @@ const ENV_SCHEMA = Type.Object({
   }),
   WEB_SERVER_PROTOCOL: Type.String(),
   WEB_SERVER_HOST: Type.String(),
+  WEB_SERVER_DOMAIN: Type.String(),
 
   DATABASE_URL: Type.String(),
 
-  JWT_SECRET: Type.String(),
+  SUPER_ADMIN_ACCESS_JWT_SECRET: Type.String(),
+  SUPER_ADMIN_ACCESS_JWT_EXPIRES_IN: Type.String(),
+  SUPER_ADMIN_REFRESH_JWT_SECRET: Type.String(),
+  SUPER_ADMIN_REFRESH_JWT_EXPIRES_IN: Type.String(),
+  TENANT_ADMIN_ACCESS_JWT_SECRET: Type.String(),
+  TENANT_ADMIN_ACCESS_JWT_EXPIRES_IN: Type.String(),
+  TENANT_ADMIN_REFRESH_JWT_SECRET: Type.String(),
+  TENANT_ADMIN_REFRESH_JWT_EXPIRES_IN: Type.String(),
+  OFFICE_USER_ACCESS_JWT_SECRET: Type.String(),
+  OFFICE_USER_ACCESS_JWT_EXPIRES_IN: Type.String(),
+  OFFICE_USER_REFRESH_JWT_SECRET: Type.String(),
+  OFFICE_USER_REFRESH_JWT_EXPIRES_IN: Type.String(),
 
   REDIS_PORT: Type.Integer({
     maximum: 65535,
     minimum: 1000,
   }),
   REDIS_HOST: Type.String(),
+
+  CRON_SECRET: Type.String(),
 });
 
 export type ENVSchemaType = Static<typeof ENV_SCHEMA>;
