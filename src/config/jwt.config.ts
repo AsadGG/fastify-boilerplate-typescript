@@ -43,5 +43,5 @@ export function JWTConfig(config: ENVSchemaType): CustomJWTOptions {
       secret: config.OFFICE_USER_REFRESH_JWT_SECRET,
       sign: { expiresIn: config.OFFICE_USER_REFRESH_JWT_EXPIRES_IN },
     },
-  };
+  } as const;
 }
