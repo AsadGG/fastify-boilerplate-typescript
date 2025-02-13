@@ -36,12 +36,6 @@ const ENV_SCHEMA = Type.Object({
 
 export type ENVSchemaType = Static<typeof ENV_SCHEMA>;
 
-declare module 'fastify' {
-  interface FastifyInstance {
-    config: ENVSchemaType;
-  }
-}
-
 function envConfig(): FastifyEnvOptions {
   return {
     confKey: 'config',
@@ -56,3 +50,9 @@ function envConfig(): FastifyEnvOptions {
 }
 
 export default envConfig;
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    config: ENVSchemaType;
+  }
+}

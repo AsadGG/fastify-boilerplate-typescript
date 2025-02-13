@@ -1,4 +1,4 @@
-export async function promiseHandler<T, E = any>(
+export async function promiseHandler<T = any, E = any>(
   promise: Promise<T>,
   onfinally?: (() => void) | null | undefined
 ) {

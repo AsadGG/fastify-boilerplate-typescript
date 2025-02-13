@@ -1,7 +1,7 @@
-import camelCase from 'lodash/camelCase.js';
-import isArray from 'lodash/isArray.js';
-import isPlainObject from 'lodash/isPlainObject.js';
-import snakeCase from 'lodash/snakeCase.js';
+import camelCase from 'lodash/camelCase';
+import isArray from 'lodash/isArray';
+import isPlainObject from 'lodash/isPlainObject';
+import snakeCase from 'lodash/snakeCase';
 
 export function camelCaseKeys(
   object: Record<string, any> | Array<Record<string, any>>

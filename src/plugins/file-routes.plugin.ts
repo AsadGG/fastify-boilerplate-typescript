@@ -78,7 +78,8 @@ async function registerRoutes(
         if (fileRouteServerPath.length === 0) {
           fileRouteServerPath = '/';
         }
-        const module = await import('file://' + currentPath);
+        const filePrefix = 'file://';
+        const module = await import(filePrefix + currentPath);
         methods.forEach((method) => {
           addRequestHandler(module, method, server, fileRouteServerPath);
         });

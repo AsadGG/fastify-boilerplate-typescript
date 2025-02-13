@@ -1,5 +1,5 @@
+import { createLogger } from '#src/logger/logger';
 import { Logger } from 'pino';
-import { createLogger } from '../logger/logger.js';
 
 const userLogger = createLogger('USER_LOGGER');
 const adminLogger = createLogger('ADMIN_LOGGER');

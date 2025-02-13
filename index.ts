@@ -1,3 +1,17 @@
+import { bcryptConfig } from '#config/bcrypt.config';
+import envConfig from '#config/env.config';
+import { fileRoutesConfig } from '#config/file-routes.config';
+import { JWTConfig } from '#config/jwt.config';
+import kyselyConfig from '#config/kysely.config';
+import { loggerConfig } from '#config/logger.config';
+import { multipartConfig } from '#config/multipart.config';
+import { redisConfig } from '#config/redis.config';
+import { swaggerConfig, swaggerUIConfig } from '#config/swagger.config';
+import fileRoutes from '#plugins/file-routes.plugin';
+import fastifyJWT from '#plugins/jwt.plugin';
+import fastifyKysely from '#plugins/kysely.plugin';
+import fastifyLogger from '#plugins/logger.plugin';
+import { createLogger } from '#src/logger/logger';
 import fastifyCORS from '@fastify/cors';
 import fastifyEnv from '@fastify/env';
 import fastifyFormbody from '@fastify/formbody';
@@ -7,20 +21,6 @@ import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastify from 'fastify';
 import { fastifyBcrypt } from 'fastify-bcrypt';
-import { bcryptConfig } from './src/config/bcrypt.config.js';
-import envConfig from './src/config/env.config.js';
-import { fileRoutesConfig } from './src/config/file-routes.config.js';
-import { JWTConfig } from './src/config/jwt.config.js';
-import kyselyConfig from './src/config/kysely.config.js';
-import { loggerConfig } from './src/config/logger.config.js';
-import { multipartConfig } from './src/config/multipart.config.js';
-import { redisConfig } from './src/config/redis.config.js';
-import { swaggerConfig, swaggerUIConfig } from './src/config/swagger.config.js';
-import { createLogger } from './src/logger/logger.js';
-import fileRoutes from './src/plugins/file-routes.plugin.js';
-import fastifyJWT from './src/plugins/jwt.plugin.js';
-import fastifyKysely from './src/plugins/kysely.plugin.js';
-import fastifyLogger from './src/plugins/logger.plugin.js';
 
 process.env.TZ = 'UTC';
 
@@ -37,6 +37,7 @@ function ajvFilePlugin(ajv: any) {
 
 const appLogger = createLogger('APP_LOGGER');
 const server = fastify({
+  genReqId: () => crypto.randomUUID(),
   logger: appLogger,
   ajv: {
     plugins: [ajvFilePlugin],

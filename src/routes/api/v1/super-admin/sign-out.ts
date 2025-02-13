@@ -1,3 +1,8 @@
+import HTTP_STATUS from '#utilities/http-status';
+import { createRedisFunctions } from '#utilities/redis-helpers';
+import { getSuperAdminKeysPattern } from '#utilities/redis-keys';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+
 const superAdminSignOutSchema = {
   description: 'this will sign out super admin',
   tags: ['v1|super admin'],
@@ -5,11 +10,14 @@ const superAdminSignOutSchema = {
   security: [{ AuthorizationSuperAdminAccess: [] }],
   operationId: 'superAdminSignOut',
 };
-export function POST(fastify) {
+export function POST(fastify: FastifyInstance) {
   return {
     schema: superAdminSignOutSchema,
     onRequest: [fastify.authenticateSuperAdminAccess],
-    handler: async function (request, reply) {
+    handler: async function (
+      request: FastifyRequest & { user: { superAdminId: string } },
+      reply: FastifyReply
+    ) {
       const { superAdminId } = request.user;
 
       const { keys, del } = createRedisFunctions(fastify.redis);

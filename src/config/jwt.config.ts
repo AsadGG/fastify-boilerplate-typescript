@@ -1,5 +1,5 @@
+import { ENVSchemaType } from '#config/env.config';
 import { FastifyJWTOptions } from '@fastify/jwt';
-import { ENVSchemaType } from './env.config.js';
 
 type JWTNamespaces =
   | 'superAdminAccess'

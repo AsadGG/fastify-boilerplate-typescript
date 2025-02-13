@@ -1,26 +1,44 @@
-import { Type } from '@sinclair/typebox';
+import { getSuperAdminByEmail } from '#repository/super_admin';
+import { getSha256Hash } from '#utilities/hash';
+import HTTP_STATUS from '#utilities/http-status';
+import { promiseHandler } from '#utilities/promise-handler';
+import { createRedisFunctions } from '#utilities/redis-helpers';
+import {
+  getSuperAdminAccessTokenKey,
+  getSuperAdminRefreshTokenKey,
+} from '#utilities/redis-keys';
+import { parse } from '@lukeed/ms';
+import { Type, type Static } from '@sinclair/typebox';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+
+const PostSchemaBody = Type.Object(
+  {
+    email: Type.String({ format: 'email' }),
+    password: Type.String({ minLength: 8 }),
+  },
+  { additionalProperties: false }
+);
 
 const superAdminSignInSchema = {
   description: 'this will sign in super admin',
   tags: ['v1|super admin'],
   summary: 'sign in super admin',
   operationId: 'superAdminSignIn',
-  body: Type.Object(
-    {
-      email: Type.String({ format: 'email' }),
-      password: Type.String({ minLength: 8 }),
-    },
-    { additionalProperties: false }
-  ),
+  body: PostSchemaBody,
 };
-export function POST(fastify) {
+export function POST(fastify: FastifyInstance) {
   return {
     schema: superAdminSignInSchema,
-    handler: async function (request, reply) {
+    handler: async function (
+      request: FastifyRequest<{
+        Body: Static<typeof PostSchemaBody>;
+      }>,
+      reply: FastifyReply
+    ) {
       const data = {
         ...request.body,
       };
-      const promise = getSuperAdminByEmail(fastify.knex, data);
+      const promise = getSuperAdminByEmail(fastify.kysely, data);
       const [result, error, ok] = await promiseHandler(promise);
       if (!ok) {
         const errorObject = {
@@ -51,8 +69,6 @@ export function POST(fastify) {
         return reply.send(errorObject);
       }
 
-      delete result.password;
-
       const superAdminId = result.id;
 
       const accessToken = fastify.jwt.superAdminAccess.sign({
@@ -78,9 +94,9 @@ export function POST(fastify) {
       );
 
       const accessTokenExpiryInSeconds =
-        parse(fastify.config.SUPER_ADMIN_ACCESS_JWT_EXPIRES_IN) / 1000;
+        (parse(fastify.config.SUPER_ADMIN_ACCESS_JWT_EXPIRES_IN) ?? 0) / 1000;
       const refreshTokenExpiryInSeconds =
-        parse(fastify.config.SUPER_ADMIN_REFRESH_JWT_EXPIRES_IN) / 1000;
+        (parse(fastify.config.SUPER_ADMIN_REFRESH_JWT_EXPIRES_IN) ?? 0) / 1000;
 
       await set(accessTokenKey, accessToken, accessTokenExpiryInSeconds);
       await set(refreshTokenKey, refreshToken, refreshTokenExpiryInSeconds);
@@ -90,6 +106,7 @@ export function POST(fastify) {
         message: 'signed in successfully.',
         data: {
           ...result,
+          password: undefined,
           accessToken: `${superAdminId}:${accessTokenHash}`,
           refreshToken: `${superAdminId}:${refreshTokenHash}`,
         },

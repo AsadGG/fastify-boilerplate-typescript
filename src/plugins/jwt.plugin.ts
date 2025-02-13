@@ -4,12 +4,9 @@ export type MyError = Error & {
   error: string;
 };
 
-import fastifyJWT from '@fastify/jwt';
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import fastifyPlugin from 'fastify-plugin';
-import { CustomJWTOptions } from '../config/jwt.config.js';
-import HTTP_STATUS from '../utilities/http-status.js';
-import { createRedisFunctions } from '../utilities/redis-helpers.js';
+import { CustomJWTOptions } from '#config/jwt.config';
+import HTTP_STATUS from '#utilities/http-status';
+import { createRedisFunctions } from '#utilities/redis-helpers';
 import {
   getOfficeUserAccessTokenKey,
   getOfficeUserRefreshTokenKey,
@@ -17,7 +14,10 @@ import {
   getSuperAdminRefreshTokenKey,
   getTenantAdminAccessTokenKey,
   getTenantAdminRefreshTokenKey,
-} from '../utilities/redis-keys.js';
+} from '#utilities/redis-keys';
+import fastifyJWT from '@fastify/jwt';
+import { FastifyInstance } from 'fastify';
+import fastifyPlugin from 'fastify-plugin';
 
 function noTokenInHeaderError() {
   const error = new Error(
@@ -60,12 +60,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
 
   fastify.decorate(
     'authenticateSuperAdminAccess',
-    async function (
-      request: FastifyRequest & {
-        superAdminAccessJwtVerify: () => Promise<any>;
-      },
-      reply: FastifyReply
-    ) {
+    async function (request, reply) {
       try {
         if (!request.headers.authorization) {
           throw noTokenInHeaderError();
@@ -91,12 +86,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
   );
   fastify.decorate(
     'authenticateSuperAdminRefresh',
-    async function (
-      request: FastifyRequest & {
-        superAdminRefreshJwtVerify: () => Promise<any>;
-      },
-      reply: FastifyReply
-    ) {
+    async function (request, reply) {
       try {
         if (!request.headers.authorization) {
           throw noTokenInHeaderError();
@@ -125,14 +115,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
 
   fastify.decorate(
     'authenticateTenantAdminAccess',
-    async function (
-      request: FastifyRequest<{
-        Params: { tenantId: string };
-      }> & {
-        tenantAdminAccessJwtVerify: () => Promise<any>;
-      },
-      reply: FastifyReply
-    ) {
+    async function (request, reply) {
       try {
         if (!request.headers.authorization) {
           throw noTokenInHeaderError();
@@ -164,14 +147,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
   );
   fastify.decorate(
     'authenticateTenantAdminRefresh',
-    async function (
-      request: FastifyRequest<{
-        Params: { tenantId: string };
-      }> & {
-        tenantAdminRefreshJwtVerify: () => Promise<any>;
-      },
-      reply: FastifyReply
-    ) {
+    async function (request, reply) {
       try {
         if (!request.headers.authorization) {
           throw noTokenInHeaderError();
@@ -206,14 +182,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
 
   fastify.decorate(
     'authenticateOfficeUserAccess',
-    async function (
-      request: FastifyRequest<{
-        Params: { tenantId: string };
-      }> & {
-        officeUserAccessJwtVerify: () => Promise<any>;
-      },
-      reply: FastifyReply
-    ) {
+    async function (request, reply) {
       try {
         if (!request.headers.authorization) {
           throw noTokenInHeaderError();
@@ -245,14 +214,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
   );
   fastify.decorate(
     'authenticateOfficeUserRefresh',
-    async function (
-      request: FastifyRequest<{
-        Params: { tenantId: string };
-      }> & {
-        officeUserRefreshJwtVerify: () => Promise<any>;
-      },
-      reply: FastifyReply
-    ) {
+    async function (request, reply) {
       try {
         if (!request.headers.authorization) {
           throw noTokenInHeaderError();
@@ -286,3 +248,71 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
 }
 
 export default fastifyPlugin(myFastifyJWT);
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    authenticateSuperAdminAccess: (
+      request: FastifyRequest,
+      reply: FastifyReply
+    ) => void;
+    authenticateSuperAdminRefresh: (
+      request: FastifyRequest,
+      reply: FastifyReply
+    ) => void;
+    authenticateTenantAdminAccess: (
+      request: FastifyRequest<{
+        Params: { tenantId: string };
+      }>,
+      reply: FastifyReply
+    ) => void;
+    authenticateTenantAdminRefresh: (
+      request: FastifyRequest<{
+        Params: { tenantId: string };
+      }>,
+      reply: FastifyReply
+    ) => void;
+    authenticateOfficeUserAccess: (
+      request: FastifyRequest<{
+        Params: { tenantId: string };
+      }>,
+      reply: FastifyReply
+    ) => void;
+    authenticateOfficeUserRefresh: (
+      request: FastifyRequest<{
+        Params: { tenantId: string };
+      }>,
+      reply: FastifyReply
+    ) => void;
+  }
+
+  interface FastifyRequest {
+    superAdminAccess: () => Promise<void>;
+    superAdminAccessJwtVerify: () => Promise<void>;
+    superAdminRefreshJwtVerify: () => Promise<void>;
+    tenantAdminAccessJwtVerify: () => Promise<void>;
+    tenantAdminRefreshJwtVerify: () => Promise<void>;
+    officeUserAccessJwtVerify: () => Promise<void>;
+    officeUserRefreshJwtVerify: () => Promise<void>;
+  }
+}
+
+declare module '@fastify/jwt' {
+  type JWTNamespaces =
+    | 'superAdminAccess'
+    | 'superAdminRefresh'
+    | 'tenantAdminAccess'
+    | 'tenantAdminRefresh'
+    | 'officeUserAccess'
+    | 'officeUserRefresh';
+
+  type OmitNamespacesJWT = Omit<JWT, JWTNamespaces>;
+
+  interface JWT {
+    superAdminAccess: OmitNamespacesJWT;
+    superAdminRefresh: OmitNamespacesJWT;
+    tenantAdminAccess: OmitNamespacesJWT;
+    tenantAdminRefresh: OmitNamespacesJWT;
+    officeUserAccess: OmitNamespacesJWT;
+    officeUserRefresh: OmitNamespacesJWT;
+  }
+}

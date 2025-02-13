@@ -1,5 +1,5 @@
+import { GLOBAL_CONSTANTS } from '#root/global-constants';
 import path from 'path';
-import { GLOBAL_CONSTANTS } from '../../global-constants.js';
 
 export function fileRoutesConfig(): { routesFolder: string } {
   return {

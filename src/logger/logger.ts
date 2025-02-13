@@ -1,9 +1,9 @@
+import { GLOBAL_CONSTANTS } from '#root/global-constants';
 import camelCase from 'lodash/camelCase.js';
 import kebabCase from 'lodash/kebabCase.js';
 import upperFirst from 'lodash/upperFirst.js';
 import path from 'path';
 import { LoggerOptions, pino } from 'pino';
-import { GLOBAL_CONSTANTS } from '../../global-constants.js';
 
 export function createLogger(moduleName: string) {
   const logFolderPath = path.join(GLOBAL_CONSTANTS.ROOT_PATH, 'logs');
@@ -30,24 +30,31 @@ export function createLogger(moduleName: string) {
     },
   };
 
-  const redact = ['request.headers.authorization'];
+  const redact = {
+    paths: ['request.headers.authorization', '*.password'],
+    censor: '*** REDACTED ***',
+  };
 
   const targets = [
     {
       level: 'info',
-      target: './log-rotator',
+      target: 'pino-roll',
       options: {
-        file: `${logFilePath}%DATE%`,
+        file: logFilePath,
         frequency: 'daily',
         mkdir: true,
         extension: '.log',
-        size: '1024k',
+        size: '8m',
+        dateFormat: 'yyyy-MM-dd',
       },
     },
     {
       level: 'info',
-      target: 'pino/file',
-      options: { destination: 1 },
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+        destination: 1,
+      },
     },
   ];
 
