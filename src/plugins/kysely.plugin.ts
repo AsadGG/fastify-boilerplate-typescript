@@ -1,5 +1,3 @@
-'use strict';
-
 import { FastifyInstance } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely';
@@ -7,7 +5,7 @@ import { DB } from 'kysely-codegen';
 import pg from 'pg';
 const { Pool } = pg;
 
-async function fastifyKyselyJS(fastify: FastifyInstance, opts: any) {
+async function fastifyKysely(fastify: FastifyInstance, opts: any) {
   const dialect = new PostgresDialect({
     pool: new Pool(opts),
   });
@@ -23,4 +21,4 @@ async function fastifyKyselyJS(fastify: FastifyInstance, opts: any) {
   });
 }
 
-export default fastifyPlugin(fastifyKyselyJS);
+export default fastifyPlugin(fastifyKysely);

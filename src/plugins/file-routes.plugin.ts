@@ -1,5 +1,3 @@
-'use strict';
-
 import { FastifyInstance } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import fs from 'fs';

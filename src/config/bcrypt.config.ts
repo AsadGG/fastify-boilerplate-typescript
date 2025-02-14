@@ -1,9 +1,7 @@
-export type bcryptPluginOpts = {
-  saltWorkFactor: number;
-};
+import { bcryptPluginOpts } from '#plugins/bcrypt.plugin';
 
 export function bcryptConfig(): bcryptPluginOpts {
   return {
-    saltWorkFactor: 12,
+    saltRounds: 12,
   };
 }

@@ -7,6 +7,7 @@ import { loggerConfig } from '#config/logger.config';
 import { multipartConfig } from '#config/multipart.config';
 import { redisConfig } from '#config/redis.config';
 import { swaggerConfig, swaggerUIConfig } from '#config/swagger.config';
+import fastifyBcrypt from '#plugins/bcrypt.plugin';
 import fileRoutes from '#plugins/file-routes.plugin';
 import fastifyJWT from '#plugins/jwt.plugin';
 import fastifyKysely from '#plugins/kysely.plugin';
@@ -20,7 +21,6 @@ import fastifyRedis from '@fastify/redis';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastify from 'fastify';
-import { fastifyBcrypt } from 'fastify-bcrypt';
 
 process.env.TZ = 'UTC';
 
@@ -35,10 +35,10 @@ function ajvFilePlugin(ajv: any) {
   });
 }
 
-const appLogger = createLogger('APP_LOGGER');
+const systemLogger = createLogger('SYSTEM_LOGGER');
 const server = fastify({
   genReqId: () => crypto.randomUUID(),
-  logger: appLogger,
+  loggerInstance: systemLogger,
   ajv: {
     plugins: [ajvFilePlugin],
     customOptions: {

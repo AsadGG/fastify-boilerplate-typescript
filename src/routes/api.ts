@@ -1,5 +1,3 @@
-'use strict';
-
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 const healthCheckSchema = {

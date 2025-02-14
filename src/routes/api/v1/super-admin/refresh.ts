@@ -34,7 +34,7 @@ export function POST(fastify: FastifyInstance) {
       if (!ok) {
         const errorObject = {
           statusCode: error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR,
-          message: error.detail ?? error.message,
+          message: error.message,
         };
         request.log.error({
           ...errorObject,

@@ -42,8 +42,14 @@ export function POST(fastify: FastifyInstance) {
       const [result, error, ok] = await promiseHandler(promise);
       if (!ok) {
         const errorObject = {
-          statusCode: error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR,
-          message: error.detail ?? error.message,
+          statusCode:
+            error.statusCode === HTTP_STATUS.NOT_FOUND
+              ? HTTP_STATUS.UNAUTHORIZED
+              : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+          message:
+            error.statusCode === HTTP_STATUS.NOT_FOUND
+              ? 'invalid credentials.'
+              : 'something went wrong.',
         };
         request.log.error({
           ...errorObject,

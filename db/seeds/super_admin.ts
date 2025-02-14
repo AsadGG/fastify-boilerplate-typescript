@@ -1,9 +1,10 @@
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import { Kysely } from 'kysely';
 import { DB } from 'kysely-codegen';
 
 export async function seed(db: Kysely<DB>) {
-  const password = await bcrypt.hash('12345678', 12);
+  const salt = bcrypt.genSaltSync(12);
+  const password = await bcrypt.hash('12345678', salt);
 
   await db
     .insertInto('superAdmin')
