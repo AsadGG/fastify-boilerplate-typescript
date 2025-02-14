@@ -1,4 +1,4 @@
-import { createLogger } from '#src/logger/logger';
+import { createLogger } from '#utilities/logger';
 
 const userLogger = createLogger('USER_LOGGER');
 const adminLogger = createLogger('ADMIN_LOGGER');

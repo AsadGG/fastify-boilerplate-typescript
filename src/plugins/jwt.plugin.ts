@@ -1,4 +1,4 @@
-import { CustomJWTOptions } from '#config/jwt.config';
+import { CustomJWTOptions } from '#configs/jwt.config';
 import { MyError } from '#src/types/my-error';
 import HTTP_STATUS from '#utilities/http-status';
 import { createRedisFunctions } from '#utilities/redis-helpers';

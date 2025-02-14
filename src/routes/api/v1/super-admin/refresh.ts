@@ -1,4 +1,4 @@
-import { getSuperAdminById } from '#repository/super_admin.js';
+import { getSuperAdminById } from '#repositories/super_admin.repository';
 import { getSha256Hash } from '#utilities/hash.js';
 import HTTP_STATUS from '#utilities/http-status.js';
 import { promiseHandler } from '#utilities/promise-handler.js';

@@ -1,4 +1,4 @@
-import { getSuperAdminByEmail } from '#repository/super_admin';
+import { getSuperAdminByEmail } from '#repositories/super_admin.repository';
 import { getSha256Hash } from '#utilities/hash';
 import HTTP_STATUS from '#utilities/http-status';
 import { promiseHandler } from '#utilities/promise-handler';
@@ -48,8 +48,8 @@ export function POST(fastify: FastifyInstance) {
               : HTTP_STATUS.INTERNAL_SERVER_ERROR,
           message:
             error.statusCode === HTTP_STATUS.NOT_FOUND
-              ? 'invalid credentials.'
-              : 'something went wrong.',
+              ? `invalid credentials.`
+              : `something went wrong.`,
         };
         request.log.error({
           ...errorObject,
@@ -66,7 +66,7 @@ export function POST(fastify: FastifyInstance) {
       if (!isPasswordMatch) {
         const errorObject = {
           statusCode: HTTP_STATUS.UNAUTHORIZED,
-          message: `invalid credentials`,
+          message: `invalid credentials.`,
         };
         request.log.error({
           ...errorObject,
@@ -109,7 +109,7 @@ export function POST(fastify: FastifyInstance) {
 
       return reply.send({
         statusCode: HTTP_STATUS.OK,
-        message: 'signed in successfully.',
+        message: `signed in successfully.`,
         data: {
           ...result,
           password: undefined,

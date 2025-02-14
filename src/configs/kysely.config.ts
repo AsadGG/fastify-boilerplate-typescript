@@ -1,4 +1,4 @@
-import { ENVSchemaType } from '#config/env.config';
+import { ENVSchemaType } from '#configs/env.config';
 import { Kysely } from 'kysely';
 import { DB } from 'kysely-codegen';
 

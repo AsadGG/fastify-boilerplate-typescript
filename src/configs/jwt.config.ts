@@ -1,4 +1,4 @@
-import { ENVSchemaType } from '#config/env.config';
+import { ENVSchemaType } from '#configs/env.config';
 import { FastifyJWTOptions } from '@fastify/jwt';
 
 type JWTNamespaces =

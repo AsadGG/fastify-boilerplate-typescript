@@ -22,9 +22,9 @@
     "build": "tsc"
   },
   "imports": {
-    "#config/*": "./src/config/*",
+    "#configs/*": "./src/configs/*",
     "#plugins/*": "./src/plugins/*",
-    "#repository/*": "./src/repository/*",
+    "#repositories/*": "./src/repositories/*",
     "#utilities/*": "./src/utilities/*",
     "#src/*": "./src/*",
     "#root/*": "./*"
