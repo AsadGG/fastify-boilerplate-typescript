@@ -71,6 +71,18 @@ await server.register(fastifySwaggerUi, swaggerUIConfig());
 
 await server.register(fileRoutes, fileRoutesConfig());
 
+server.get(
+  '/',
+  {
+    schema: {
+      hide: true,
+    },
+  },
+  (_request, reply) => {
+    return reply.redirect('/api');
+  }
+);
+
 await server.ready();
 
 await server.listen({

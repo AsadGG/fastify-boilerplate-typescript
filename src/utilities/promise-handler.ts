@@ -3,7 +3,7 @@ export async function promiseHandler<T = any, E = any>(
   onfinally?: (() => void) | null | undefined
 ) {
   return promise
-    .then((result) => [result, null, true] as const)
-    .catch((error: E) => [null, error, false] as const)
+    .then((result) => [null, result, true] as const)
+    .catch((error: E) => [error, null, false] as const)
     .finally(onfinally);
 }

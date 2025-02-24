@@ -39,7 +39,7 @@ export function POST(fastify: FastifyInstance) {
         ...request.body,
       };
       const promise = getSuperAdminByEmail(fastify.kysely, data);
-      const [result, error, ok] = await promiseHandler(promise);
+      const [error, result, ok] = await promiseHandler(promise);
       if (!ok) {
         const errorObject = {
           statusCode:
@@ -52,8 +52,8 @@ export function POST(fastify: FastifyInstance) {
               : `something went wrong.`,
         };
         request.log.error({
-          ...errorObject,
           payload: data,
+          error: error,
         });
         return reply.send(errorObject);
       }
@@ -69,8 +69,8 @@ export function POST(fastify: FastifyInstance) {
           message: `invalid credentials.`,
         };
         request.log.error({
-          ...errorObject,
           payload: data,
+          error: error,
         });
         return reply.send(errorObject);
       }

@@ -16,7 +16,7 @@ export async function getSuperAdminById(
     .where('id', '=', data.id)
     .executeTakeFirst();
 
-  const [result, error, ok] = await promiseHandler(promise);
+  const [error, result, ok] = await promiseHandler(promise);
 
   if (!ok) {
     throw error;
@@ -24,7 +24,7 @@ export async function getSuperAdminById(
 
   if (!result) {
     const error = new Error(
-      `super admin of id "${data.id}" does not exist`
+      `super admin of id '${data.id}' does not exist`
     ) as MyError;
     error.statusCode = HTTP_STATUS.NOT_FOUND;
     throw error;
@@ -45,7 +45,7 @@ export async function getSuperAdminByEmail(
     .where('email', '=', data.email)
     .executeTakeFirst();
 
-  const [result, error, ok] = await promiseHandler(promise);
+  const [error, result, ok] = await promiseHandler(promise);
 
   if (!ok) {
     throw error;
@@ -53,7 +53,7 @@ export async function getSuperAdminByEmail(
 
   if (!result) {
     const error = new Error(
-      `super admin of email "${data.email}" does not exist`
+      `super admin of email '${data.email}' does not exist`
     ) as MyError;
     error.statusCode = HTTP_STATUS.NOT_FOUND;
     throw error;

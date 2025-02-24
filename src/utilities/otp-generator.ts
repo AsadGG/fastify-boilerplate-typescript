@@ -2,7 +2,7 @@ function baseRandom(lower: number, upper: number) {
   return lower + Math.floor(Math.random() * (upper - lower + 1));
 }
 
-function arraySample(array: Array<any>) {
+function arraySample<T = any>(array: Array<T>) {
   return array.length ? array[baseRandom(0, array.length - 1)] : undefined;
 }
 

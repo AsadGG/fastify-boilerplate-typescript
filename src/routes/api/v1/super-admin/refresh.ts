@@ -30,15 +30,15 @@ export function POST(fastify: FastifyInstance) {
       };
 
       const promise = getSuperAdminById(fastify.kysely, data);
-      const [result, error, ok] = await promiseHandler(promise);
+      const [error, result, ok] = await promiseHandler(promise);
       if (!ok) {
         const errorObject = {
           statusCode: error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR,
           message: error.message,
         };
         request.log.error({
-          ...errorObject,
           payload: data,
+          error: error,
         });
         return reply.send(errorObject);
       }
