@@ -7,7 +7,7 @@ import {
 } from '#utilities/pagination-helpers';
 import { POSTGRES_ERROR_CODES } from '#utilities/postgres_error_codes';
 import { promiseHandler } from '#utilities/promise-handler';
-import { Kysely } from 'kysely';
+import { Kysely, sql } from 'kysely';
 import { DB } from 'kysely-codegen';
 
 export async function getTodos(
@@ -25,7 +25,7 @@ export async function getTodos(
 
   const query = kysely
     .selectFrom('todo')
-    .where('isDeleted', '=', false)
+    .where('deletedAt', 'is', null)
     .$if(Boolean(data.search), (qb) => {
       if (!data.search) return qb;
       const searchText = '%' + data.search.replaceAll('%', '\\%') + '%';
@@ -75,7 +75,7 @@ export async function getTodoById(
   const query = kysely
     .selectFrom('todo')
     .select(['id', 'task', 'completed'])
-    .where('isDeleted', '=', false)
+    .where('deletedAt', 'is', null)
     .where('id', '=', data.todoId)
     .executeTakeFirst();
 
@@ -142,7 +142,7 @@ export async function updateTodoById(
   const query = kysely
     .updateTable('todo')
     .set('task', data.task)
-    .where('isDeleted', '=', false)
+    .where('deletedAt', 'is', null)
     .where('id', '=', data.todoId)
     .returning(['id', 'task', 'completed'])
     .executeTakeFirst();
@@ -175,8 +175,8 @@ export async function deleteTodoById(
 ) {
   const query = kysely
     .updateTable('todo')
-    .set('isDeleted', true)
-    .where('isDeleted', '=', false)
+    .set('deletedAt', sql`CURRENT_TIMESTAMP`)
+    .where('deletedAt', 'is', null)
     .where('id', '=', data.todoId)
     .returning(['id'])
     .executeTakeFirst();
@@ -210,7 +210,7 @@ export async function updateTodoCompletionById(
   const query = kysely
     .updateTable('todo')
     .set('completed', data.completed)
-    .where('isDeleted', '=', false)
+    .where('deletedAt', 'is', null)
     .where('id', '=', data.todoId)
     .returning(['id', 'task', 'completed'])
     .executeTakeFirst();

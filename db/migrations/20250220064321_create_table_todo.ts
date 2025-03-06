@@ -10,21 +10,21 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('task', 'text', (col) => col.notNull())
     .addColumn('completed', 'boolean', (col) => col.defaultTo(false).notNull())
     .addColumn('is_active', 'boolean', (col) => col.defaultTo(true).notNull())
-    .addColumn('is_deleted', 'boolean', (col) => col.defaultTo(false).notNull())
     .addColumn('created_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )
     .addColumn('updated_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )
+    .addColumn('deleted_at', 'timestamptz', (col) => col.defaultTo(null))
     .execute();
 
-  db.schema
+  await db.schema
     .createIndex('todo_task_unique')
     .on('todo')
     .column('task')
     .unique()
-    .where(sql.ref('is_deleted'), '=', false)
+    .where(sql.ref('deleted_at'), 'is', null)
     .execute();
 
   await createUpdateTimestampTrigger('todo').execute(db);
