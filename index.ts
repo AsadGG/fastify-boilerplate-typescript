@@ -43,6 +43,10 @@ const server = fastify({
     plugins: [ajvFilePlugin],
     customOptions: {
       keywords: ['collectionFormat'],
+      coerceTypes: 'array',
+      useDefaults: true,
+      removeAdditional: true,
+      allErrors: true,
     },
   },
 });
