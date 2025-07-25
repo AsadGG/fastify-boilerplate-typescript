@@ -3,42 +3,45 @@ import { FastifySwaggerUiOptions } from '@fastify/swagger-ui';
 
 export function swaggerConfig(): SwaggerOptions {
   return {
-    swagger: {
+    openapi: {
+      openapi: '3.0.0',
       info: {
         title: 'My Fastify App Documentation Title',
         description: 'My FirstApp Backend Documentation Description',
         version: '1.0.0',
       },
-      securityDefinitions: {
-        AuthorizationSuperAdminAccess: {
-          type: 'apiKey',
-          name: 'Authorization',
-          in: 'header',
-        },
-        AuthorizationSuperAdminRefresh: {
-          type: 'apiKey',
-          name: 'Authorization',
-          in: 'header',
-        },
-        AuthorizationTenantAdminAccess: {
-          type: 'apiKey',
-          name: 'Authorization',
-          in: 'header',
-        },
-        AuthorizationTenantAdminRefresh: {
-          type: 'apiKey',
-          name: 'Authorization',
-          in: 'header',
-        },
-        AuthorizationOfficeUserAccess: {
-          type: 'apiKey',
-          name: 'Authorization',
-          in: 'header',
-        },
-        AuthorizationOfficeUserRefresh: {
-          type: 'apiKey',
-          name: 'Authorization',
-          in: 'header',
+      components: {
+        securitySchemes: {
+          AuthorizationSuperAdminAccess: {
+            type: 'apiKey',
+            name: 'Authorization',
+            in: 'header',
+          },
+          AuthorizationSuperAdminRefresh: {
+            type: 'apiKey',
+            name: 'Authorization',
+            in: 'header',
+          },
+          AuthorizationTenantAdminAccess: {
+            type: 'apiKey',
+            name: 'Authorization',
+            in: 'header',
+          },
+          AuthorizationTenantAdminRefresh: {
+            type: 'apiKey',
+            name: 'Authorization',
+            in: 'header',
+          },
+          AuthorizationOfficeUserAccess: {
+            type: 'apiKey',
+            name: 'Authorization',
+            in: 'header',
+          },
+          AuthorizationOfficeUserRefresh: {
+            type: 'apiKey',
+            name: 'Authorization',
+            in: 'header',
+          },
         },
       },
     },
