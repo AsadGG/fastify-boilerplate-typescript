@@ -3,9 +3,7 @@ import { sql, type Kysely } from 'kysely';
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('super_admin')
-    .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_random_uuid()`)
-    )
+    .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`uuidv7()`))
     .addColumn('name', 'text', (col) => col.notNull())
     .addColumn('password', 'text', (col) => col.notNull())
     .addColumn('email', 'text', (col) => col.notNull())

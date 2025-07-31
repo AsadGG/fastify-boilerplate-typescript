@@ -4,9 +4,7 @@ import { createUpdateTimestampTrigger } from '../kysely.utilities';
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('todo')
-    .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`gen_random_uuid()`)
-    )
+    .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`uuidv7()`))
     .addColumn('task', 'text', (col) => col.notNull())
     .addColumn('completed', 'boolean', (col) => col.defaultTo(false).notNull())
     .addColumn('is_active', 'boolean', (col) => col.defaultTo(true).notNull())
