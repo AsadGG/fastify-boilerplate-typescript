@@ -27,8 +27,8 @@ export async function getTodos(
     .selectFrom('todo')
     .where('deletedAt', 'is', null)
     .$if(Boolean(data.search), (qb) => {
-      if (!data.search) return qb;
-      const searchText = '%' + data.search.replaceAll('%', '\\%') + '%';
+      if (!data.search || !data.search.trim()) return qb;
+      const searchText = `%${data.search.replace(/[%_]/g, '\\$&')}%`;
       return qb.where('task', 'ilike', searchText);
     });
 
