@@ -1,4 +1,4 @@
-import camelCase from 'lodash/camelCase';
+import camelCase from 'lodash/camelCase.js';
 
 export default function getConflicts(errorMessage: string) {
   const regex = /Key \((.+)\)=\((.+)\) .* ./i;

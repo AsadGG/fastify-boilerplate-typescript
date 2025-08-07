@@ -13,7 +13,7 @@ const methods = [
   'OPTIONS',
 ] as const;
 
-const extensions = ['.ts'];
+const extensions = ['.ts', '.js'];
 
 type Module = {
   [functionName in (typeof methods)[number]]: (fastify: FastifyInstance) => any;

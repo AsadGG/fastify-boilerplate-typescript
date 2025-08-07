@@ -1,12 +1,12 @@
 import { getSuperAdminById } from '#repositories/super_admin.repository';
-import { getSha256Hash } from '#utilities/hash.js';
-import HTTP_STATUS from '#utilities/http-status.js';
-import { promiseHandler } from '#utilities/promise-handler.js';
-import { createRedisFunctions } from '#utilities/redis-helpers.js';
+import { getSha256Hash } from '#utilities/hash';
+import HTTP_STATUS from '#utilities/http-status';
+import { promiseHandler } from '#utilities/promise-handler';
+import { createRedisFunctions } from '#utilities/redis-helpers';
 import {
   getSuperAdminAccessTokenKey,
   getSuperAdminRefreshTokenKey,
-} from '#utilities/redis-keys.js';
+} from '#utilities/redis-keys';
 import { parse } from '@lukeed/ms';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 

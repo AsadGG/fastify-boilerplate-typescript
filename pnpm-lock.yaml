@@ -74,6 +74,9 @@ importers:
       pino:
         specifier: ^9.7.0
         version: 9.7.0
+      pino-pretty:
+        specifier: ^13.1.1
+        version: 13.1.1
       pino-roll:
         specifier: ^3.1.0
         version: 3.1.0
@@ -138,9 +141,6 @@ importers:
       lint-staged:
         specifier: ^16.1.4
         version: 16.1.4
-      pino-pretty:
-        specifier: ^13.1.1
-        version: 13.1.1
       prettier:
         specifier: ^3.6.2
         version: 3.6.2

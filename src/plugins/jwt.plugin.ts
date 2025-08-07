@@ -41,7 +41,7 @@ function tokenInvalidError() {
 }
 
 const TOKEN_PATTERN =
-  /^([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[4][0-9A-Fa-f]{3}-[89AaBb][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}):([A-Fa-f0-9]{64})$/;
+  /^([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[1-7][0-9A-Fa-f]{3}-[89AaBb][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}):([A-Fa-f0-9]{64})$/;
 
 async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
   await fastify.register(fastifyJWT, opts.superAdminAccess);
