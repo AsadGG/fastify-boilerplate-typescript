@@ -162,6 +162,14 @@ export async function updateTodoById(
     throw error;
   }
 
+  if (!result) {
+    const error = new Error(
+      `todo of id '${data.todoId}' does not exist`
+    ) as MyError;
+    error.statusCode = HTTP_STATUS.NOT_FOUND;
+    throw error;
+  }
+
   const record = result;
 
   return { record };
