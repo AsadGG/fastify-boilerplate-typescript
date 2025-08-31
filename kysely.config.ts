@@ -1,5 +1,5 @@
 import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely';
-import { DB } from 'kysely-codegen';
+import type { DB } from 'kysely-codegen';
 import { defineConfig, getKnexTimestampPrefix } from 'kysely-ctl';
 import pg from 'pg';
 
