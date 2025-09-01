@@ -3,7 +3,7 @@ import camelCase from 'lodash/camelCase.js';
 import kebabCase from 'lodash/kebabCase.js';
 import upperFirst from 'lodash/upperFirst.js';
 import path from 'path';
-import { LoggerOptions, pino } from 'pino';
+import pino, { type LoggerOptions } from 'pino';
 
 export function createLogger(moduleName: string) {
   const logFolderPath = path.join(GLOBAL_CONSTANTS.ROOT_PATH, 'logs');

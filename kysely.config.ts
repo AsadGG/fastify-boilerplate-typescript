@@ -20,10 +20,10 @@ const db = new Kysely<DB>({
 export default defineConfig({
   kysely: db,
   migrations: {
-    migrationFolder: `/db/migrations`,
+    migrationFolder: `./db/migrations`,
     getMigrationPrefix: getKnexTimestampPrefix,
   },
   seeds: {
-    seedFolder: `/db/seeds`,
+    seedFolder: `./db/seeds`,
   },
 });
