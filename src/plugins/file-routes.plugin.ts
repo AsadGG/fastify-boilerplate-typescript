@@ -1,101 +1,119 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, RouteOptions } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
+import { pathToFileURL } from 'url';
 
 const methods = [
-  'DELETE',
   'GET',
   'HEAD',
-  'PATCH',
   'POST',
   'PUT',
+  'PATCH',
+  'DELETE',
   'OPTIONS',
 ] as const;
 
-const extensions = ['.ts', '.js'];
+type Module = Partial<
+  Record<(typeof methods)[number], (fastify: FastifyInstance) => RouteOptions>
+>;
 
-type Module = {
-  [functionName in (typeof methods)[number]]: (fastify: FastifyInstance) => any;
-};
+const extensions = ['.ts', '.js'];
 
 function isRoute(extension: string) {
   return extensions.includes(extension);
 }
 
 function isTest(name: string) {
-  return (
-    name.endsWith('.test') || name.endsWith('.spec') || name.endsWith('.bench')
-  );
+  return /\.(test|spec|bench)\.[tj]s$/.test(name);
 }
 
 function shouldIgnore(name: string) {
   return name.startsWith('_');
 }
 
-async function addRequestHandler(
-  module: Module,
-  method: (typeof methods)[number],
-  server: FastifyInstance,
-  fileRouteServerPath: string
-) {
-  const route = module[method];
-  if (route) {
-    server.route({
-      ...route(server),
-      method: method,
-      url: fileRouteServerPath,
-    });
-  }
+function normalizeDynamic(name: string) {
+  // Converts "[id]" -> ":id"
+  return name.replace(/^\[(.+)\]$/, ':$1');
 }
 
-async function registerRoutes(
+async function collectRoutes(
   server: FastifyInstance,
   folder: string,
   pathPrefix = ''
-) {
-  const registerRoutesFolders = fs
-    .readdirSync(folder, { withFileTypes: true })
-    .map(async (folderOrFile) => {
-      const currentPath = path.join(folder, folderOrFile.name);
-      const routeServerPath = `${pathPrefix}/${folderOrFile.name
-        .replace('[', ':')
-        .replace(']', '')}`;
-      if (folderOrFile.isDirectory()) {
-        await registerRoutes(server, currentPath, routeServerPath);
-      } else if (folderOrFile.isFile()) {
-        const { ext, name } = path.parse(folderOrFile.name);
-        if (!isRoute(ext) || isTest(name) || shouldIgnore(name)) {
-          return;
-        }
-        let fileRouteServerPath = pathPrefix;
-        if (name !== 'index') {
-          fileRouteServerPath +=
-            '/' + name.replace('[', ':').replace(/\]?$/, '');
-        }
-        if (fileRouteServerPath.length === 0) {
-          fileRouteServerPath = '/';
-        }
-        const filePrefix = 'file://';
-        const module = await import(filePrefix + currentPath);
-        methods.forEach((method) => {
-          addRequestHandler(module, method, server, fileRouteServerPath);
-        });
+): Promise<RouteOptions[]> {
+  const routes: RouteOptions[] = [];
+  const entries = await fs.readdir(folder, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const currentPath = path.join(folder, entry.name);
+    const routeServerPath = `${pathPrefix}/${normalizeDynamic(entry.name)}`;
+
+    if (entry.isDirectory()) {
+      const subRoutes = await collectRoutes(
+        server,
+        currentPath,
+        routeServerPath
+      );
+      routes.push(...subRoutes);
+    } else if (entry.isFile()) {
+      const { ext, name } = path.parse(entry.name);
+      if (!isRoute(ext) || isTest(entry.name) || shouldIgnore(name)) {
+        continue;
       }
-    });
-  await Promise.all(registerRoutesFolders);
+
+      let fileRouteServerPath = pathPrefix;
+      if (name !== 'index') {
+        fileRouteServerPath += '/' + normalizeDynamic(name);
+      }
+      if (!fileRouteServerPath) fileRouteServerPath = '/';
+
+      try {
+        const module: Module = await import(pathToFileURL(currentPath).href);
+        for (const method of methods) {
+          const route = module[method];
+          if (route) {
+            routes.push({
+              ...route(server),
+              method,
+              url: fileRouteServerPath,
+            });
+          }
+        }
+      } catch (err) {
+        server.log.error(
+          { err, file: currentPath },
+          'Failed to load route module'
+        );
+      }
+    }
+  }
+
+  return routes;
 }
 
-async function fileRoutes(server: FastifyInstance, opts: any) {
-  if (!(opts && opts.routesFolder)) {
-    throw new Error(`fileRoutes: should provide opts.routesFolder`);
+type FileRoutesOptions = {
+  routesFolder: string;
+  pathPrefix?: string;
+};
+async function fileRoutes(server: FastifyInstance, opts: FileRoutesOptions) {
+  if (!opts?.routesFolder) {
+    throw new Error(`fileRoutes: opts.routesFolder is required`);
   }
-  try {
-    await registerRoutes(server, opts.routesFolder, opts.pathPrefix);
-  } catch (error: any) {
-    const { message } = error;
-    throw new Error(`fileRoutes: error registering routers: ${message}`);
-  }
+
+  const routes = await collectRoutes(
+    server,
+    opts.routesFolder,
+    opts.pathPrefix ?? ''
+  );
+
+  await Promise.all(
+    routes
+      .sort((a, b) =>
+        a.url.localeCompare(b.url, undefined, { sensitivity: 'base' })
+      )
+      .map((r) => server.route(r))
+  );
 }
 
 export default fastifyPlugin(fileRoutes);
