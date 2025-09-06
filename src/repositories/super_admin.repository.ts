@@ -1,5 +1,5 @@
 import { MyError } from '#src/types/my-error';
-import HTTP_STATUS from '#utilities/http-status';
+import HTTP_STATUS from '#utilities/http-status-codes';
 import { promiseHandler } from '#utilities/promise-handler';
 import { Kysely } from 'kysely';
 import { DB } from 'kysely-codegen';

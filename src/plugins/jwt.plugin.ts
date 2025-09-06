@@ -1,6 +1,6 @@
 import { CustomJWTOptions } from '#configs/jwt.config';
 import { MyError } from '#src/types/my-error';
-import HTTP_STATUS from '#utilities/http-status';
+import HTTP_STATUS from '#utilities/http-status-codes';
 import { createRedisFunctions } from '#utilities/redis-helpers';
 import {
   getOfficeUserAccessTokenKey,

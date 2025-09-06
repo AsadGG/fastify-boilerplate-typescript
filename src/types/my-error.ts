@@ -1,5 +1,7 @@
+import { HttpStatusCode } from '#utilities/http-status-codes';
+
 export type MyError = Error & {
-  statusCode: number;
+  statusCode: HttpStatusCode;
   code: string;
   error: string;
 };

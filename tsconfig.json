@@ -33,6 +33,7 @@
       "#configs/*": ["src/configs/*"],
       "#plugins/*": ["src/plugins/*"],
       "#repositories/*": ["src/repositories/*"],
+      "#schemas/*": ["src/schemas/*"],
       "#utilities/*": ["src/utilities/*"],
       "#src/*": ["src/*"], // Or leave this out, it's usually not needed
       "#root/*": ["*"] // Highly recommend to avoid this one

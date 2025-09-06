@@ -1,6 +1,6 @@
 import { MyError } from '#src/types/my-error';
 import getConflicts from '#utilities/get-conflicts';
-import HTTP_STATUS from '#utilities/http-status';
+import HTTP_STATUS from '#utilities/http-status-codes';
 import {
   getLimitAndOffset,
   getPaginationObject,

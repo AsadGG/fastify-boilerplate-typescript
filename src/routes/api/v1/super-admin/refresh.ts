@@ -1,6 +1,7 @@
 import { getSuperAdminById } from '#repositories/super_admin.repository';
+import { ErrorResponseSchema, ResponseSchema } from '#schemas/common.schema';
 import { getSha256Hash } from '#utilities/hash';
-import HTTP_STATUS from '#utilities/http-status';
+import HTTP_STATUS from '#utilities/http-status-codes';
 import { promiseHandler } from '#utilities/promise-handler';
 import { createRedisFunctions } from '#utilities/redis-helpers';
 import {
@@ -8,14 +9,60 @@ import {
   getSuperAdminRefreshTokenKey,
 } from '#utilities/redis-keys';
 import { parse } from '@lukeed/ms';
+import { Type } from '@sinclair/typebox';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
+//#region POST
+const AuthenticateUserSchema = Type.Object(
+  {
+    id: Type.String({
+      format: 'uuid',
+      description: 'unique identifier of the user',
+    }),
+    name: Type.String({ description: 'full name of the user' }),
+    email: Type.String({ format: 'email', description: 'email address' }),
+    phone: Type.String({ description: 'phone number' }),
+    image: Type.Union(
+      [
+        Type.String({ format: 'uri', description: 'profile image url' }),
+        Type.Null(),
+      ],
+      { description: 'optional profile image' }
+    ),
+    accessToken: Type.String({
+      description: 'access token used for authentication',
+      examples: [
+        '01234567-89ab-4cde-8f01-23456789abcd:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+      ],
+    }),
+    refreshToken: Type.String({
+      description: 'refresh token used to obtain new access tokens',
+      examples: [
+        '01234567-89ab-4cde-8f01-23456789abcd:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+      ],
+    }),
+  },
+  { additionalProperties: false }
+);
 const superAdminSignInSchema = {
   description: 'this will refresh super admin tokens',
   tags: ['v1|super admin'],
   summary: 'super admin refresh',
   security: [{ AuthorizationSuperAdminRefresh: [] }],
   operationId: 'superAdminRefresh',
+  response: {
+    [HTTP_STATUS.OK]: ResponseSchema(
+      AuthenticateUserSchema,
+      HTTP_STATUS.OK,
+      'token refreshed successfully.'
+    ),
+    [HTTP_STATUS.UNAUTHORIZED]: ErrorResponseSchema(
+      HTTP_STATUS.UNAUTHORIZED,
+      'FST_JWT_AUTHORIZATION_TOKEN_EXPIRED',
+      'Unauthorized',
+      'Authorization token expired'
+    ),
+  },
 };
 export function POST(fastify: FastifyInstance) {
   return {
@@ -32,15 +79,17 @@ export function POST(fastify: FastifyInstance) {
       const promise = getSuperAdminById(fastify.kysely, data);
       const [error, result, ok] = await promiseHandler(promise);
       if (!ok) {
+        const statusCode =
+          error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          statusCode: error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR,
+          statusCode,
           message: error.message,
         };
         request.log.error({
           payload: data,
           error: error,
         });
-        return reply.send(errorObject);
+        return reply.status(statusCode).send(errorObject);
       }
 
       const superAdminId = result.id;
@@ -74,7 +123,7 @@ export function POST(fastify: FastifyInstance) {
       await set(accessTokenKey, accessToken, accessTokenExpiryInSeconds);
       await set(refreshTokenKey, refreshToken, refreshTokenExpiryInSeconds);
 
-      return reply.send({
+      return reply.status(HTTP_STATUS.OK).send({
         statusCode: HTTP_STATUS.OK,
         message: 'token refreshed successfully.',
         data: {
@@ -87,3 +136,4 @@ export function POST(fastify: FastifyInstance) {
     },
   };
 }
+//#endregion POST
