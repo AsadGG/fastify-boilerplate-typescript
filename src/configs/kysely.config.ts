@@ -1,6 +1,4 @@
 import { ENVSchemaType } from '#configs/env.config';
-import { Kysely } from 'kysely';
-import { DB } from 'kysely-codegen';
 
 function kyselyConfig(config: ENVSchemaType) {
   return {
@@ -10,9 +8,3 @@ function kyselyConfig(config: ENVSchemaType) {
 }
 
 export default kyselyConfig;
-
-declare module 'fastify' {
-  interface FastifyInstance {
-    kysely: Kysely<DB>;
-  }
-}

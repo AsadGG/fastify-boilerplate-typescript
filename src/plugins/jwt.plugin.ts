@@ -1,5 +1,4 @@
 import { CustomJWTOptions } from '#configs/jwt.config';
-import { MyError } from '#src/types/my-error';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { createRedisFunctions } from '#utilities/redis-helpers';
 import {
@@ -10,35 +9,28 @@ import {
   getTenantAdminAccessTokenKey,
   getTenantAdminRefreshTokenKey,
 } from '#utilities/redis-keys';
+import createError from '@fastify/error';
 import fastifyJWT from '@fastify/jwt';
 import { FastifyInstance } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 
-function noTokenInHeaderError() {
-  const error = new Error(
-    `No Authorization was found in request.headers`
-  ) as MyError;
-  error.statusCode = HTTP_STATUS.UNAUTHORIZED;
-  error.code = `FST_JWT_NO_AUTHORIZATION_IN_HEADER`;
-  error.error = `Unauthorized`;
-  return error;
-}
-function tokenExpiredError() {
-  const error = new Error(`Authorization token expired`) as MyError;
-  error.statusCode = HTTP_STATUS.UNAUTHORIZED;
-  error.code = `FST_JWT_AUTHORIZATION_TOKEN_EXPIRED`;
-  error.error = `Unauthorized`;
-  return error;
-}
-function tokenInvalidError() {
-  const error = new Error(
-    `Authorization token is invalid. format is Bearer 01234567-89ab-4cde-8f01-23456789abcd:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef`
-  ) as MyError;
-  error.statusCode = HTTP_STATUS.UNAUTHORIZED;
-  error.code = `FST_JWT_AUTHORIZATION_TOKEN_INVALID`;
-  error.error = `Unauthorized`;
-  return error;
-}
+const NoAuthorizationInHeaderError = createError(
+  'FST_JWT_NO_AUTHORIZATION_IN_HEADER',
+  'No Authorization was found in request.headers',
+  HTTP_STATUS.UNAUTHORIZED
+);
+
+const AuthorizationTokenExpiredError = createError(
+  'FST_JWT_AUTHORIZATION_TOKEN_EXPIRED',
+  'Authorization token expired',
+  HTTP_STATUS.UNAUTHORIZED
+);
+
+const AuthorizationTokenInvalidError = createError(
+  'FST_JWT_AUTHORIZATION_TOKEN_INVALID',
+  'Authorization token is invalid. format is Bearer 01234567-89ab-4cde-8f01-23456789abcd:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+  HTTP_STATUS.UNAUTHORIZED
+);
 
 const TOKEN_PATTERN =
   /^([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[1-7][0-9A-Fa-f]{3}-[89AaBb][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}):([A-Fa-f0-9]{64})$/;
@@ -58,19 +50,19 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
     async function (request, reply) {
       try {
         if (!request.headers.authorization) {
-          throw noTokenInHeaderError();
+          throw new NoAuthorizationInHeaderError();
         }
         const regExpExecArray = TOKEN_PATTERN.exec(
           request.headers.authorization.replace('Bearer ', '')
         );
         if (!regExpExecArray) {
-          throw tokenInvalidError();
+          throw new AuthorizationTokenInvalidError();
         }
         const [, superAdminId, tokenHash] = regExpExecArray;
         const key = getSuperAdminAccessTokenKey(superAdminId, tokenHash);
         const token = await get(key);
         if (!token) {
-          throw tokenExpiredError();
+          throw new AuthorizationTokenExpiredError();
         }
         request.headers.authorization = `Bearer ${token}`;
         await request.superAdminAccessJwtVerify();
@@ -84,20 +76,20 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
     async function (request, reply) {
       try {
         if (!request.headers.authorization) {
-          throw noTokenInHeaderError();
+          throw new NoAuthorizationInHeaderError();
         }
 
         const regExpExecArray = TOKEN_PATTERN.exec(
           request.headers.authorization.replace('Bearer ', '')
         );
         if (!regExpExecArray) {
-          throw tokenInvalidError();
+          throw new AuthorizationTokenInvalidError();
         }
         const [, superAdminId, tokenHash] = regExpExecArray;
         const key = getSuperAdminRefreshTokenKey(superAdminId, tokenHash);
         const token = await get(key);
         if (!token) {
-          throw tokenExpiredError();
+          throw new AuthorizationTokenExpiredError();
         }
         await del([key]);
         request.headers.authorization = `Bearer ${token}`;
@@ -113,14 +105,14 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
     async function (request, reply) {
       try {
         if (!request.headers.authorization) {
-          throw noTokenInHeaderError();
+          throw new NoAuthorizationInHeaderError();
         }
 
         const regExpExecArray = TOKEN_PATTERN.exec(
           request.headers.authorization.replace('Bearer ', '')
         );
         if (!regExpExecArray) {
-          throw tokenInvalidError();
+          throw new AuthorizationTokenInvalidError();
         }
         const tenantId = request.params.tenantId;
         const [, tenantAdminId, tokenHash] = regExpExecArray;
@@ -131,7 +123,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         );
         const token = await get(key);
         if (!token) {
-          throw tokenExpiredError();
+          throw new AuthorizationTokenExpiredError();
         }
         request.headers.authorization = `Bearer ${token}`;
         await request.tenantAdminAccessJwtVerify();
@@ -145,14 +137,14 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
     async function (request, reply) {
       try {
         if (!request.headers.authorization) {
-          throw noTokenInHeaderError();
+          throw new NoAuthorizationInHeaderError();
         }
 
         const regExpExecArray = TOKEN_PATTERN.exec(
           request.headers.authorization.replace('Bearer ', '')
         );
         if (!regExpExecArray) {
-          throw tokenInvalidError();
+          throw new AuthorizationTokenInvalidError();
         }
         const tenantId = request.params.tenantId;
         const [, tenantAdminId, tokenHash] = regExpExecArray;
@@ -164,7 +156,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
 
         const token = await get(key);
         if (!token) {
-          throw tokenExpiredError();
+          throw new AuthorizationTokenExpiredError();
         }
         await del([key]);
         request.headers.authorization = `Bearer ${token}`;
@@ -180,14 +172,14 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
     async function (request, reply) {
       try {
         if (!request.headers.authorization) {
-          throw noTokenInHeaderError();
+          throw new NoAuthorizationInHeaderError();
         }
 
         const regExpExecArray = TOKEN_PATTERN.exec(
           request.headers.authorization.replace('Bearer ', '')
         );
         if (!regExpExecArray) {
-          throw tokenInvalidError();
+          throw new AuthorizationTokenInvalidError();
         }
         const tenantId = request.params.tenantId;
         const [, officeUserId, tokenHash] = regExpExecArray;
@@ -198,7 +190,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         );
         const token = await get(key);
         if (!token) {
-          throw tokenExpiredError();
+          throw new AuthorizationTokenExpiredError();
         }
         request.headers.authorization = `Bearer ${token}`;
         await request.officeUserAccessJwtVerify();
@@ -212,14 +204,14 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
     async function (request, reply) {
       try {
         if (!request.headers.authorization) {
-          throw noTokenInHeaderError();
+          throw new NoAuthorizationInHeaderError();
         }
 
         const regExpExecArray = TOKEN_PATTERN.exec(
           request.headers.authorization.replace('Bearer ', '')
         );
         if (!regExpExecArray) {
-          throw tokenInvalidError();
+          throw new AuthorizationTokenInvalidError();
         }
         const tenantId = request.params.tenantId;
         const [, officeUserId, tokenHash] = regExpExecArray;
@@ -230,7 +222,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         );
         const token = await get(key);
         if (!token) {
-          throw tokenExpiredError();
+          throw new AuthorizationTokenExpiredError();
         }
         await del([key]);
         request.headers.authorization = `Bearer ${token}`;

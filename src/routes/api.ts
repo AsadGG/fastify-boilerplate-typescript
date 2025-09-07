@@ -2,6 +2,7 @@ import { EmptyResponseSchema } from '#schemas/common.schema';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
+//#region GET
 const healthCheckSchema = {
   description: `This route sends a response to the client with a status code of 200 and a message that the server is running.`,
   tags: ['health check'],
@@ -16,9 +17,11 @@ export function GET(_fastify: FastifyInstance) {
     schema: healthCheckSchema,
     handler: async function (request: FastifyRequest, reply: FastifyReply) {
       request.log.info({ message: 'server is running.' });
-      return reply
-        .status(HTTP_STATUS.OK)
-        .send({ statusCode: HTTP_STATUS.OK, message: 'server is running.' });
+      return reply.status(HTTP_STATUS.OK).send({
+        statusCode: HTTP_STATUS.OK,
+        message: 'server is running.',
+      });
     },
   };
 }
+//#endregion GET

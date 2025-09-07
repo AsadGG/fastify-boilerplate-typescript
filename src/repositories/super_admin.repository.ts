@@ -1,8 +1,20 @@
-import { MyError } from '#src/types/my-error';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { promiseHandler } from '#utilities/promise-handler';
+import createError from '@fastify/error';
 import { Kysely } from 'kysely';
 import { DB } from 'kysely-codegen';
+
+const SuperAdminIdNotFoundError = createError(
+  'APP_SUPER_ADMIN_ID_NOT_FOUND',
+  "super admin with id '%s' does not exist",
+  HTTP_STATUS.NOT_FOUND
+);
+
+const SuperAdminEmailNotFoundError = createError(
+  'APP_SUPER_ADMIN_EMAIL_NOT_FOUND',
+  "Super admin with email '%s' does not exist",
+  HTTP_STATUS.NOT_FOUND
+);
 
 export async function getSuperAdminById(
   kysely: Kysely<DB>,
@@ -23,11 +35,7 @@ export async function getSuperAdminById(
   }
 
   if (!result) {
-    const error = new Error(
-      `super admin of id '${data.id}' does not exist`
-    ) as MyError;
-    error.statusCode = HTTP_STATUS.NOT_FOUND;
-    throw error;
+    throw new SuperAdminIdNotFoundError(data.id);
   }
 
   return result;
@@ -52,11 +60,7 @@ export async function getSuperAdminByEmail(
   }
 
   if (!result) {
-    const error = new Error(
-      `super admin of email '${data.email}' does not exist`
-    ) as MyError;
-    error.statusCode = HTTP_STATUS.NOT_FOUND;
-    throw error;
+    throw new SuperAdminEmailNotFoundError(data.email);
   }
 
   return result;

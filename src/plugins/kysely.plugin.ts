@@ -22,3 +22,9 @@ async function fastifyKysely(fastify: FastifyInstance, opts: any) {
 }
 
 export default fastifyPlugin(fastifyKysely);
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    kysely: Kysely<DB>;
+  }
+}

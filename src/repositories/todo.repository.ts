@@ -1,4 +1,3 @@
-import { MyError } from '#src/types/my-error';
 import getConflicts from '#utilities/get-conflicts';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import {
@@ -7,8 +6,21 @@ import {
 } from '#utilities/pagination-helpers';
 import { POSTGRES_ERROR_CODES } from '#utilities/postgres_error_codes';
 import { promiseHandler } from '#utilities/promise-handler';
+import createError from '@fastify/error';
 import { Kysely, sql } from 'kysely';
 import { DB } from 'kysely-codegen';
+
+const TodoIdNotFoundError = createError(
+  'APP_TODO_ID_NOT_FOUND',
+  "todo with id '%s' does not exist",
+  HTTP_STATUS.NOT_FOUND
+);
+
+const TodoAlreadyExistsError = createError(
+  'APP_TODO_ALREADY_EXISTS',
+  "todo '%s' already exists",
+  HTTP_STATUS.CONFLICT
+);
 
 export async function getTodos(
   kysely: Kysely<DB>,
@@ -86,11 +98,7 @@ export async function getTodoById(
   }
 
   if (!result) {
-    const error = new Error(
-      `todo of id '${data.todoId}' does not exist`
-    ) as MyError;
-    error.statusCode = HTTP_STATUS.NOT_FOUND;
-    throw error;
+    throw new TodoIdNotFoundError(data.todoId);
   }
 
   const record = result;
@@ -117,11 +125,7 @@ export async function createTodo(
   if (!ok) {
     if (error.code === POSTGRES_ERROR_CODES.UNIQUE_VIOLATION) {
       const conflicts = getConflicts(error.detail);
-      const alreadyExistError = new Error(
-        `task '${conflicts.task}' already exist`
-      ) as MyError;
-      alreadyExistError.statusCode = HTTP_STATUS.CONFLICT;
-      throw alreadyExistError;
+      throw new TodoAlreadyExistsError(conflicts.task);
     }
 
     throw error;
@@ -152,22 +156,14 @@ export async function updateTodoById(
   if (!ok) {
     if (error.code === POSTGRES_ERROR_CODES.UNIQUE_VIOLATION) {
       const conflicts = getConflicts(error.detail);
-      const alreadyExistError = new Error(
-        `task '${conflicts.task}' already exist`
-      ) as MyError;
-      alreadyExistError.statusCode = HTTP_STATUS.CONFLICT;
-      throw alreadyExistError;
+      throw new TodoAlreadyExistsError(conflicts.task);
     }
 
     throw error;
   }
 
   if (!result) {
-    const error = new Error(
-      `todo of id '${data.todoId}' does not exist`
-    ) as MyError;
-    error.statusCode = HTTP_STATUS.NOT_FOUND;
-    throw error;
+    throw new TodoIdNotFoundError(data.todoId);
   }
 
   const record = result;
@@ -196,11 +192,7 @@ export async function deleteTodoById(
   }
 
   if (!result) {
-    const error = new Error(
-      `todo of id '${data.todoId}' does not exist`
-    ) as MyError;
-    error.statusCode = HTTP_STATUS.NOT_FOUND;
-    throw error;
+    throw new TodoIdNotFoundError(data.todoId);
   }
 
   const record = result;
@@ -230,11 +222,7 @@ export async function updateTodoCompletionById(
   }
 
   if (!result) {
-    const error = new Error(
-      `todo of id '${data.todoId}' does not exist`
-    ) as MyError;
-    error.statusCode = HTTP_STATUS.NOT_FOUND;
-    throw error;
+    throw new TodoIdNotFoundError(data.todoId);
   }
 
   const record = result;
