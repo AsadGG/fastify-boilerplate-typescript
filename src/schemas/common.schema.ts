@@ -65,12 +65,15 @@ export function PaginatedResponseSchema<T extends TSchema>(
   statusCode: HttpStatusCode = HTTP_STATUS.OK,
   message: string = 'records fetched successfully.'
 ) {
-  return Type.Object({
-    statusCode: Type.Literal(statusCode),
-    message: Type.String({ examples: [message] }),
-    data: Type.Array(schema),
-    pagination: PaginationMetaSchema,
-  });
+  return Type.Object(
+    {
+      statusCode: Type.Literal(statusCode),
+      message: Type.String({ examples: [message] }),
+      data: Type.Array(schema),
+      pagination: PaginationMetaSchema,
+    },
+    { additionalProperties: false }
+  );
 }
 
 export function ResponseSchema<T extends TSchema>(
@@ -78,21 +81,27 @@ export function ResponseSchema<T extends TSchema>(
   statusCode: HttpStatusCode = 200,
   message: string = 'record fetched successfully.'
 ) {
-  return Type.Object({
-    statusCode: Type.Literal(statusCode),
-    message: Type.String({ examples: [message] }),
-    data: schema,
-  });
+  return Type.Object(
+    {
+      statusCode: Type.Literal(statusCode),
+      message: Type.String({ examples: [message] }),
+      data: schema,
+    },
+    { additionalProperties: false }
+  );
 }
 
 export function EmptyResponseSchema(
   statusCode: HttpStatusCode = 200,
   message: string = 'action performed successfully.'
 ) {
-  return Type.Object({
-    statusCode: Type.Literal(statusCode),
-    message: Type.String({ examples: [message] }),
-  });
+  return Type.Object(
+    {
+      statusCode: Type.Literal(statusCode),
+      message: Type.String({ examples: [message] }),
+    },
+    { additionalProperties: false }
+  );
 }
 
 export function ErrorResponseSchema(
@@ -101,21 +110,24 @@ export function ErrorResponseSchema(
   error: string = 'Bad Request',
   message: string = 'Invalid input provided.'
 ) {
-  return Type.Object({
-    statusCode: Type.Literal(statusCode, {
-      description: 'http status code of the error response',
-    }),
-    code: Type.String({
-      examples: [code],
-      description: 'application or framework-specific error code',
-    }),
-    error: Type.String({
-      examples: [error],
-      description: 'short error label or type',
-    }),
-    message: Type.String({
-      examples: [message],
-      description: 'detailed human-readable error message',
-    }),
-  });
+  return Type.Object(
+    {
+      statusCode: Type.Literal(statusCode, {
+        description: 'http status code of the error response',
+      }),
+      code: Type.String({
+        examples: [code],
+        description: 'application or framework-specific error code',
+      }),
+      error: Type.String({
+        examples: [error],
+        description: 'short error label or type',
+      }),
+      message: Type.String({
+        examples: [message],
+        description: 'detailed human-readable error message',
+      }),
+    },
+    { additionalProperties: false }
+  );
 }
