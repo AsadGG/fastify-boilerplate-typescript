@@ -19,16 +19,24 @@ const AuthenticateUserSchema = Type.Object(
       format: 'uuid',
       description: 'unique identifier of the user',
     }),
-    name: Type.String({ description: 'full name of the user' }),
+    name: Type.String({
+      description: 'full name of the user',
+      examples: ['John doe'],
+    }),
     email: Type.String({ format: 'email', description: 'email address' }),
-    phone: Type.String({ description: 'phone number' }),
-    image: Type.Union(
-      [
-        Type.String({ format: 'uri', description: 'profile image url' }),
-        Type.Null(),
-      ],
-      { description: 'optional profile image' }
-    ),
+    phone: Type.String({
+      description: 'phone number',
+      examples: ['03001234567'],
+    }),
+    image: Type.Union([
+      Type.Object({
+        filename: Type.String({ examples: ['profile-picture.png'] }),
+        url: Type.String({ format: 'uri' }),
+        mimetype: Type.String({ examples: ['image/png'] }),
+        size: Type.Number({ examples: [8192] }),
+      }),
+      Type.Null(),
+    ]),
     accessToken: Type.String({
       description: 'access token used for authentication',
       examples: [
@@ -150,6 +158,10 @@ export function POST(fastify: FastifyInstance) {
 
       await set(accessTokenKey, accessToken, accessTokenExpiryInSeconds);
       await set(refreshTokenKey, refreshToken, refreshTokenExpiryInSeconds);
+
+      if (result.image) {
+        result.image.url = `${fastify.config.WEB_SERVER_DOMAIN}${result.image.url}`;
+      }
 
       return reply.status(HTTP_STATUS.OK).send({
         statusCode: HTTP_STATUS.OK,

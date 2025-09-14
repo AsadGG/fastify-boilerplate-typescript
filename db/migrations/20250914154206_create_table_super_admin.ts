@@ -8,7 +8,9 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('password', 'text', (col) => col.notNull())
     .addColumn('email', 'text', (col) => col.notNull())
     .addColumn('phone', 'text', (col) => col.notNull())
-    .addColumn('image', 'text')
+    .addColumn('image_file_id', 'uuid', (col) =>
+      col.references('file.id').onDelete('set null')
+    )
     .addUniqueConstraint('email_unique', ['email'])
     .addUniqueConstraint('phone_unique', ['phone'])
     .execute();

@@ -160,3 +160,7 @@ profile-*
 profile*
 *clinic*
 *flamegraph*
+
+
+# upload files
+uploads

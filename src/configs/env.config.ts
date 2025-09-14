@@ -31,6 +31,9 @@ const ENV_SCHEMA = Type.Object({
   }),
   REDIS_HOST: Type.String(),
 
+  STATIC_SERVE_FOLDER: Type.String(),
+  STATIC_SERVE_PREFIX: Type.String(),
+
   CRON_SECRET: Type.String(),
 });
 
