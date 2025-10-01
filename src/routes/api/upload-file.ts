@@ -117,7 +117,7 @@ export function POST(fastify: FastifyInstance) {
         message: 'file uploaded successfully.',
         data: {
           ...result.record,
-          url: `${fastify.config.WEB_SERVER_DOMAIN}${url}`,
+          url: `${fastify.config.WEB_SERVER_BASE_URL}${url}`,
         },
       });
     },

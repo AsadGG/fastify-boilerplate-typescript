@@ -160,7 +160,7 @@ export function POST(fastify: FastifyInstance) {
       await set(refreshTokenKey, refreshToken, refreshTokenExpiryInSeconds);
 
       if (result.image) {
-        result.image.url = `${fastify.config.WEB_SERVER_DOMAIN}${result.image.url}`;
+        result.image.url = `${fastify.config.WEB_SERVER_BASE_URL}${result.image.url}`;
       }
 
       return reply.status(HTTP_STATUS.OK).send({

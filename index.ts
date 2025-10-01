@@ -94,13 +94,13 @@ server.get(
 await server.ready();
 
 await server.listen({
-  host: server.config.WEB_SERVER_HOST,
+  host: server.config.WEB_SERVER_BIND_ADDRESS,
   port: server.config.WEB_SERVER_PORT,
   listenTextResolver: () => {
     const host =
-      server.config.WEB_SERVER_HOST === '0.0.0.0'
+      server.config.WEB_SERVER_BIND_ADDRESS === '0.0.0.0'
         ? 'localhost'
-        : server.config.WEB_SERVER_HOST;
+        : server.config.WEB_SERVER_BIND_ADDRESS;
     return `server is listening at http://${host}:${server.config.WEB_SERVER_PORT}`;
   },
 });

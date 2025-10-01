@@ -2,13 +2,12 @@ import { FastifyEnvOptions } from '@fastify/env';
 import { Static, Type } from '@sinclair/typebox';
 
 const ENV_SCHEMA = Type.Object({
+  WEB_SERVER_BIND_ADDRESS: Type.String(),
   WEB_SERVER_PORT: Type.Integer({
     maximum: 65535,
     minimum: 1000,
   }),
-  WEB_SERVER_PROTOCOL: Type.String(),
-  WEB_SERVER_HOST: Type.String(),
-  WEB_SERVER_DOMAIN: Type.String(),
+  WEB_SERVER_BASE_URL: Type.String(),
 
   DATABASE_URL: Type.String(),
 
