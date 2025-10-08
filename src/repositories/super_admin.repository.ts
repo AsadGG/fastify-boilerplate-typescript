@@ -3,7 +3,7 @@ import { promiseHandler } from '#utilities/promise-handler';
 import createError from '@fastify/error';
 import { Kysely } from 'kysely';
 import { DB } from 'kysely-codegen';
-import { jsonObjectFrom } from 'kysely/helpers/postgres';
+import { fileJsonExpression } from './query-helpers';
 
 const SuperAdminIdNotFoundError = createError(
   'APP_SUPER_ADMIN_ID_NOT_FOUND',
@@ -26,18 +26,14 @@ export async function getSuperAdminById(
   const promise = kysely
     .selectFrom('superAdmin')
     .where('superAdmin.id', '=', data.id)
+    .leftJoin('file', 'file.id', 'superAdmin.id')
     .select((eb) => [
       'superAdmin.email',
       'superAdmin.id',
       'superAdmin.name',
       'superAdmin.password',
       'superAdmin.phone',
-      jsonObjectFrom(
-        eb
-          .selectFrom('file')
-          .select(['file.filename', 'file.url', 'file.mimetype', 'file.size'])
-          .whereRef('file.id', '=', 'superAdmin.imageFileId')
-      ).as('image'),
+      fileJsonExpression(eb).as('image'),
     ])
     .executeTakeFirst();
 
@@ -62,19 +58,15 @@ export async function getSuperAdminByEmail(
 ) {
   const promise = kysely
     .selectFrom('superAdmin')
-    .where('email', '=', data.email)
+    .where('superAdmin.email', '=', data.email)
+    .leftJoin('file', 'file.id', 'superAdmin.imageFileId')
     .select((eb) => [
       'superAdmin.email',
       'superAdmin.id',
       'superAdmin.name',
       'superAdmin.password',
       'superAdmin.phone',
-      jsonObjectFrom(
-        eb
-          .selectFrom('file')
-          .select(['file.filename', 'file.url', 'file.mimetype', 'file.size'])
-          .whereRef('file.id', '=', 'superAdmin.imageFileId')
-      ).as('image'),
+      fileJsonExpression(eb).as('image'),
     ])
     .executeTakeFirst();
 

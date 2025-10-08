@@ -18,7 +18,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .execute();
 
   await db.schema
-    .createIndex('todo_task_unique')
+    .createIndex('todo_task_unique_index')
     .on('todo')
     .column('task')
     .unique()

@@ -22,14 +22,15 @@ import fastifyRedis from '@fastify/redis';
 import fastifyStaticServe from '@fastify/static';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
+import Ajv from 'ajv';
 import fastify from 'fastify';
 
 process.env.TZ = 'UTC';
 
-function ajvFilePlugin(ajv: any) {
+function ajvFilePlugin(ajv: Ajv) {
   return ajv.addKeyword({
     keyword: 'isFile',
-    compile: (_schema: any, parent: any) => {
+    compile: (_schema, parent) => {
       parent.type = 'file';
       delete parent.isFile;
       return () => true;

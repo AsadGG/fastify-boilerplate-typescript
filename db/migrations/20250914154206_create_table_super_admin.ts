@@ -14,6 +14,12 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addUniqueConstraint('email_unique', ['email'])
     .addUniqueConstraint('phone_unique', ['phone'])
     .execute();
+
+  await db.schema
+    .createIndex('super_admin_image_file_id_index')
+    .on('super_admin')
+    .column('image_file_id')
+    .execute();
 }
 
 export async function down(db: Kysely<any>): Promise<void> {

@@ -1,5 +1,6 @@
 import { FastifyEnvOptions } from '@fastify/env';
 import { Static, Type } from '@sinclair/typebox';
+import Ajv from 'ajv';
 
 const ENV_SCHEMA = Type.Object({
   WEB_SERVER_BIND_ADDRESS: Type.String(),
@@ -45,7 +46,7 @@ function envConfig(): FastifyEnvOptions {
       path: `.env`,
     },
     ajv: {
-      customOptions: (ajv: any) => ajv.addSchema({ coerceTypes: true }),
+      customOptions: (ajv: Ajv) => ajv.addSchema({ coerceTypes: true }),
     },
     schema: ENV_SCHEMA,
   };
