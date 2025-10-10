@@ -14,10 +14,10 @@ export function createRedisFunctions(redis: FastifyRedis) {
     }
   }
 
-  async function set(key: string, value: any, expiryInSeconds: number) {
+  async function set(key: string, value: any, ttlMs?: number) {
     const stringifiedJson = JSON.stringify(value);
-    if (expiryInSeconds) {
-      return redis.set(key, stringifiedJson, 'EX', expiryInSeconds);
+    if (ttlMs) {
+      return redis.set(key, stringifiedJson, 'PX', ttlMs);
     }
     return redis.set(key, stringifiedJson);
   }

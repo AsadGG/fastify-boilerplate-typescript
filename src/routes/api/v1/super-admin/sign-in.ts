@@ -151,13 +151,13 @@ export function POST(fastify: FastifyInstance) {
         refreshTokenHash
       );
 
-      const accessTokenExpiryInSeconds =
-        (parse(fastify.config.SUPER_ADMIN_ACCESS_JWT_EXPIRES_IN) ?? 0) / 1000;
-      const refreshTokenExpiryInSeconds =
-        (parse(fastify.config.SUPER_ADMIN_REFRESH_JWT_EXPIRES_IN) ?? 0) / 1000;
+      const accessTokenExpiry =
+        parse(fastify.config.SUPER_ADMIN_ACCESS_JWT_EXPIRES_IN) ?? 0;
+      const refreshTokenExpiry =
+        parse(fastify.config.SUPER_ADMIN_REFRESH_JWT_EXPIRES_IN) ?? 0;
 
-      await set(accessTokenKey, accessToken, accessTokenExpiryInSeconds);
-      await set(refreshTokenKey, refreshToken, refreshTokenExpiryInSeconds);
+      await set(accessTokenKey, accessToken, accessTokenExpiry);
+      await set(refreshTokenKey, refreshToken, refreshTokenExpiry);
 
       if (result.image) {
         result.image.url = `${fastify.config.WEB_SERVER_BASE_URL}${result.image.url}`;
