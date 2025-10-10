@@ -3,8 +3,7 @@ import {
   ErrorResponseSchema,
 } from '#schemas/common.schema';
 import HTTP_STATUS from '#utilities/http-status-codes';
-import { createRedisFunctions } from '#utilities/redis-helpers';
-import { getSuperAdminKeysPattern } from '#utilities/redis-keys';
+import { getSuperAdminKeysPattern } from '#utilities/key-helpers';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 //#region POST
@@ -37,7 +36,7 @@ export function POST(fastify: FastifyInstance) {
     ) {
       const { superAdminId } = request.user;
 
-      const { keys, del } = createRedisFunctions(fastify.redis);
+      const { keys, del } = fastify.kvStore;
 
       const pattern = getSuperAdminKeysPattern(superAdminId);
 

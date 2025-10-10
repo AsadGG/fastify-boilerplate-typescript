@@ -1,6 +1,5 @@
 import { CustomJWTOptions } from '#configs/jwt.config';
 import HTTP_STATUS from '#utilities/http-status-codes';
-import { createRedisFunctions } from '#utilities/redis-helpers';
 import {
   getOfficeUserAccessTokenKey,
   getOfficeUserRefreshTokenKey,
@@ -8,7 +7,7 @@ import {
   getSuperAdminRefreshTokenKey,
   getTenantAdminAccessTokenKey,
   getTenantAdminRefreshTokenKey,
-} from '#utilities/redis-keys';
+} from '#utilities/key-helpers';
 import createError from '@fastify/error';
 import fastifyJWT from '@fastify/jwt';
 import { FastifyInstance } from 'fastify';
@@ -43,7 +42,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
   await fastify.register(fastifyJWT, opts.officeUserAccess);
   await fastify.register(fastifyJWT, opts.officeUserRefresh);
 
-  const { get, del } = createRedisFunctions(fastify.redis);
+  const { get, del } = fastify.kvStore;
 
   fastify.decorate(
     'authenticateSuperAdminAccess',

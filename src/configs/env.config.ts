@@ -25,12 +25,6 @@ const ENV_SCHEMA = Type.Object({
   OFFICE_USER_REFRESH_JWT_SECRET: Type.String(),
   OFFICE_USER_REFRESH_JWT_EXPIRES_IN: Type.String(),
 
-  REDIS_PORT: Type.Integer({
-    maximum: 65535,
-    minimum: 1000,
-  }),
-  REDIS_HOST: Type.String(),
-
   STATIC_SERVE_FOLDER: Type.String(),
   STATIC_SERVE_PREFIX: Type.String(),
 

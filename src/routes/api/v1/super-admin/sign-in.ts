@@ -2,12 +2,11 @@ import { getSuperAdminByEmail } from '#repositories/super_admin.repository';
 import { EmptyResponseSchema, ResponseSchema } from '#schemas/common.schema';
 import { getSha256Hash } from '#utilities/hash';
 import HTTP_STATUS from '#utilities/http-status-codes';
-import { promiseHandler } from '#utilities/promise-handler';
-import { createRedisFunctions } from '#utilities/redis-helpers';
 import {
   getSuperAdminAccessTokenKey,
   getSuperAdminRefreshTokenKey,
-} from '#utilities/redis-keys';
+} from '#utilities/key-helpers';
+import { promiseHandler } from '#utilities/promise-handler';
 import { parse } from '@lukeed/ms';
 import { Type, type Static } from '@sinclair/typebox';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
@@ -140,7 +139,7 @@ export function POST(fastify: FastifyInstance) {
       const accessTokenHash = getSha256Hash(accessToken);
       const refreshTokenHash = getSha256Hash(refreshToken);
 
-      const { set } = createRedisFunctions(fastify.redis);
+      const { set } = fastify.kvStore;
 
       const accessTokenKey = getSuperAdminAccessTokenKey(
         superAdminId,
@@ -151,13 +150,13 @@ export function POST(fastify: FastifyInstance) {
         refreshTokenHash
       );
 
-      const accessTokenExpiryInSeconds =
-        (parse(fastify.config.SUPER_ADMIN_ACCESS_JWT_EXPIRES_IN) ?? 0) / 1000;
-      const refreshTokenExpiryInSeconds =
-        (parse(fastify.config.SUPER_ADMIN_REFRESH_JWT_EXPIRES_IN) ?? 0) / 1000;
+      const accessTokenExpiry =
+        parse(fastify.config.SUPER_ADMIN_ACCESS_JWT_EXPIRES_IN) ?? 0;
+      const refreshTokenExpiry =
+        parse(fastify.config.SUPER_ADMIN_REFRESH_JWT_EXPIRES_IN) ?? 0;
 
-      await set(accessTokenKey, accessToken, accessTokenExpiryInSeconds);
-      await set(refreshTokenKey, refreshToken, refreshTokenExpiryInSeconds);
+      await set(accessTokenKey, accessToken, accessTokenExpiry);
+      await set(refreshTokenKey, refreshToken, refreshTokenExpiry);
 
       if (result.image) {
         result.image.url = `${fastify.config.WEB_SERVER_BASE_URL}${result.image.url}`;

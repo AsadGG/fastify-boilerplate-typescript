@@ -21,7 +21,9 @@ async function fastifyKysely(fastify: FastifyInstance, opts: PoolConfig) {
   });
 }
 
-export default fastifyPlugin(fastifyKysely);
+export default fastifyPlugin(fastifyKysely, {
+  name: 'fastify-kysely',
+});
 
 declare module 'fastify' {
   interface FastifyInstance {

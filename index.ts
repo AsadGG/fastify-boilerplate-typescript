@@ -2,15 +2,16 @@ import { bcryptConfig } from '#configs/bcrypt.config';
 import envConfig from '#configs/env.config';
 import { fileRoutesConfig } from '#configs/file-routes.config';
 import { JWTConfig } from '#configs/jwt.config';
+import kyselyKVConfig from '#configs/kysely-kv.config';
 import kyselyConfig from '#configs/kysely.config';
 import { loggerConfig } from '#configs/logger.config';
 import { multipartConfig } from '#configs/multipart.config';
-import { redisConfig } from '#configs/redis.config';
 import { staticServeConfig } from '#configs/static-serve.config';
 import { swaggerConfig, swaggerUIConfig } from '#configs/swagger.config';
 import fastifyBcrypt from '#plugins/bcrypt.plugin';
 import fileRoutes from '#plugins/file-routes.plugin';
 import fastifyJWT from '#plugins/jwt.plugin';
+import fastifyKyselyKVStore from '#plugins/kysely-kv.plugin';
 import fastifyKysely from '#plugins/kysely.plugin';
 import fastifyLogger from '#plugins/logger.plugin';
 import { createLogger } from '#utilities/logger';
@@ -18,7 +19,6 @@ import fastifyCORS from '@fastify/cors';
 import fastifyEnv from '@fastify/env';
 import fastifyFormbody from '@fastify/formbody';
 import fastifyMultipart from '@fastify/multipart';
-import fastifyRedis from '@fastify/redis';
 import fastifyStaticServe from '@fastify/static';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
@@ -62,7 +62,7 @@ await server.register(fastifyCORS, { origin: '*' });
 
 await server.register(fastifyKysely, kyselyConfig(server.config));
 
-await server.register(fastifyRedis, redisConfig(server.config));
+await server.register(fastifyKyselyKVStore, kyselyKVConfig());
 
 await server.register(fastifyFormbody);
 
