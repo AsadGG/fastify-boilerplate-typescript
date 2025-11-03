@@ -1,4 +1,4 @@
-import { FastifyRedis } from '@fastify/redis';
+import type { FastifyRedis } from '@fastify/redis';
 
 export function createRedisFunctions(redis: FastifyRedis) {
   async function get(key: string) {
@@ -8,7 +8,8 @@ export function createRedisFunctions(redis: FastifyRedis) {
         return JSON.parse(stringifiedJson);
       }
       return null;
-    } catch {
+    }
+    catch {
       await redis.del(key);
       return null;
     }

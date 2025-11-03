@@ -1,16 +1,17 @@
+import type { Static } from '@sinclair/typebox';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { updateTodoCompletionById } from '#repositories/todo.repository';
-import { ResponseSchema, EmptyResponseSchema } from '#schemas/common.schema';
+import { EmptyResponseSchema, ResponseSchema } from '#schemas/common.schema';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { promiseHandler } from '#utilities/promise-handler';
-import { Static, Type } from '@sinclair/typebox';
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { Type } from '@sinclair/typebox';
 
-//#region PATCH
+// #region PATCH
 const PatchSchemaParams = Type.Object(
   {
     todoId: Type.String({ format: 'uuid' }),
   },
-  { additionalProperties: false }
+  { additionalProperties: false },
 );
 const incompleteTodoSchema = {
   description: 'this will mark todo as incomplete',
@@ -26,22 +27,22 @@ const incompleteTodoSchema = {
         completed: Type.Boolean({ examples: [false] }),
       }),
       HTTP_STATUS.OK,
-      'record marked as incomplete'
+      'record marked as incomplete',
     ),
     [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
       HTTP_STATUS.NOT_FOUND,
-      'record does not exist'
+      'record does not exist',
     ),
   },
 };
 export function PATCH(fastify: FastifyInstance) {
   return {
     schema: incompleteTodoSchema,
-    handler: async function (
+    async handler(
       request: FastifyRequest<{
         Params: Static<typeof PatchSchemaParams>;
       }>,
-      reply: FastifyReply
+      reply: FastifyReply,
     ) {
       const data = {
         todoId: request.params.todoId,
@@ -52,15 +53,15 @@ export function PATCH(fastify: FastifyInstance) {
       const [error, result, ok] = await promiseHandler(promise);
 
       if (!ok) {
-        const statusCode =
-          error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
+        const statusCode
+          = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
           statusCode,
           message: error.message,
         };
         request.log.error({
           payload: data,
-          error: error,
+          error,
         });
         return reply.status(statusCode).send(errorObject);
       }
@@ -72,4 +73,4 @@ export function PATCH(fastify: FastifyInstance) {
     },
   };
 }
-//#endregion PATCH
+// #endregion PATCH

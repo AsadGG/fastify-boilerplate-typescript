@@ -17,7 +17,7 @@ const NUMBERS_AND_LETTERS = NUMBERS + UPPERCASE_LETTERS + LOWERCASE_LETTERS;
 export function generateOtp(length = 6, unique = false): string {
   if (unique && length > NUMBERS_AND_UPPERCASE_LETTERS.length) {
     throw new Error(
-      `length can not be greater than ${NUMBERS_AND_UPPERCASE_LETTERS.length}`
+      `length can not be greater than ${NUMBERS_AND_UPPERCASE_LETTERS.length}`,
     );
   }
 
@@ -30,12 +30,11 @@ export function generateOtp(length = 6, unique = false): string {
   }
 
   return Array.from({ length }, () =>
-    stringSample(NUMBERS_AND_UPPERCASE_LETTERS)
-  ).join('');
+    stringSample(NUMBERS_AND_UPPERCASE_LETTERS)).join('');
 }
 
 export function generateRandomPassword(length = 8) {
   return Array.from({ length }, () => stringSample(NUMBERS_AND_LETTERS)).join(
-    ''
+    '',
   );
 }

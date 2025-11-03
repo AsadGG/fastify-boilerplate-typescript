@@ -1,8 +1,10 @@
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify';
+import type { DB } from 'kysely-codegen';
+import type { PoolConfig } from 'pg';
 import fastifyPlugin from 'fastify-plugin';
 import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely';
-import { DB } from 'kysely-codegen';
-import pg, { PoolConfig } from 'pg';
+import pg from 'pg';
+
 const { Pool } = pg;
 
 async function fastifyKysely(fastify: FastifyInstance, opts: PoolConfig) {

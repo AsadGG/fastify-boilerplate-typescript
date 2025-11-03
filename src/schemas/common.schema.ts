@@ -1,5 +1,7 @@
-import HTTP_STATUS, { HttpStatusCode } from '#utilities/http-status-codes';
-import { TSchema, Type } from '@sinclair/typebox';
+import type { HttpStatusCode } from '#utilities/http-status-codes';
+import type { TSchema } from '@sinclair/typebox';
+import HTTP_STATUS from '#utilities/http-status-codes';
+import { Type } from '@sinclair/typebox';
 
 export const PaginationQuerySchema = Type.Object(
   {
@@ -16,7 +18,7 @@ export const PaginationQuerySchema = Type.Object(
       description: 'number of records per page',
     }),
   },
-  { additionalProperties: false }
+  { additionalProperties: false },
 );
 
 export const SearchQuerySchema = Type.Object(
@@ -25,10 +27,10 @@ export const SearchQuerySchema = Type.Object(
       Type.String({
         description:
           'search term to filter results (applied to supported fields)',
-      })
+      }),
     ),
   },
-  { additionalProperties: false }
+  { additionalProperties: false },
 );
 export const PaginationMetaSchema = Type.Object(
   {
@@ -57,13 +59,13 @@ export const PaginationMetaSchema = Type.Object(
       description: 'current page number',
     }),
   },
-  { additionalProperties: false }
+  { additionalProperties: false },
 );
 
 export function PaginatedResponseSchema<T extends TSchema>(
   schema: T,
   statusCode: HttpStatusCode = HTTP_STATUS.OK,
-  message: string = 'records fetched successfully.'
+  message: string = 'records fetched successfully.',
 ) {
   return Type.Object(
     {
@@ -72,14 +74,14 @@ export function PaginatedResponseSchema<T extends TSchema>(
       data: Type.Array(schema),
       pagination: PaginationMetaSchema,
     },
-    { additionalProperties: false }
+    { additionalProperties: false },
   );
 }
 
 export function ResponseSchema<T extends TSchema>(
   schema: T,
   statusCode: HttpStatusCode = 200,
-  message: string = 'record fetched successfully.'
+  message: string = 'record fetched successfully.',
 ) {
   return Type.Object(
     {
@@ -87,20 +89,20 @@ export function ResponseSchema<T extends TSchema>(
       message: Type.String({ examples: [message] }),
       data: schema,
     },
-    { additionalProperties: false }
+    { additionalProperties: false },
   );
 }
 
 export function EmptyResponseSchema(
   statusCode: HttpStatusCode = 200,
-  message: string = 'action performed successfully.'
+  message: string = 'action performed successfully.',
 ) {
   return Type.Object(
     {
       statusCode: Type.Literal(statusCode),
       message: Type.String({ examples: [message] }),
     },
-    { additionalProperties: false }
+    { additionalProperties: false },
   );
 }
 
@@ -108,7 +110,7 @@ export function ErrorResponseSchema(
   statusCode: HttpStatusCode = 400,
   code: string = 'FST_ERROR',
   error: string = 'Bad Request',
-  message: string = 'Invalid input provided.'
+  message: string = 'Invalid input provided.',
 ) {
   return Type.Object(
     {
@@ -128,6 +130,6 @@ export function ErrorResponseSchema(
         description: 'detailed human-readable error message',
       }),
     },
-    { additionalProperties: false }
+    { additionalProperties: false },
   );
 }

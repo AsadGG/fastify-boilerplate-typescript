@@ -1,4 +1,4 @@
-import { FastifyLoggerOptions } from '#plugins/logger.plugin';
+import type { FastifyLoggerOptions } from '#plugins/logger.plugin';
 import { createLogger } from '#utilities/logger';
 
 const userLogger = createLogger('USER_LOGGER');

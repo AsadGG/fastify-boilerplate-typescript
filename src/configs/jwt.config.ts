@@ -1,13 +1,13 @@
-import { ENVSchemaType } from '#configs/env.config';
-import { FastifyJWTOptions } from '@fastify/jwt';
+import type { ENVSchemaType } from '#configs/env.config';
+import type { FastifyJWTOptions } from '@fastify/jwt';
 
-type JWTNamespaces =
-  | 'superAdminAccess'
-  | 'superAdminRefresh'
-  | 'tenantAdminAccess'
-  | 'tenantAdminRefresh'
-  | 'officeUserAccess'
-  | 'officeUserRefresh';
+type JWTNamespaces
+  = | 'superAdminAccess'
+    | 'superAdminRefresh'
+    | 'tenantAdminAccess'
+    | 'tenantAdminRefresh'
+    | 'officeUserAccess'
+    | 'officeUserRefresh';
 
 export type CustomJWTOptions = Record<JWTNamespaces, FastifyJWTOptions>;
 

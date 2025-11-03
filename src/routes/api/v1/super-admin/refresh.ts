@@ -1,3 +1,4 @@
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { getSuperAdminById } from '#repositories/super_admin.repository';
 import { ErrorResponseSchema, ResponseSchema } from '#schemas/common.schema';
 import { getSha256Hash } from '#utilities/hash';
@@ -10,9 +11,8 @@ import {
 } from '#utilities/redis-keys';
 import { parse } from '@lukeed/ms';
 import { Type } from '@sinclair/typebox';
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-//#region POST
+// #region POST
 const AuthenticateUserSchema = Type.Object(
   {
     id: Type.String({
@@ -50,7 +50,7 @@ const AuthenticateUserSchema = Type.Object(
       ],
     }),
   },
-  { additionalProperties: false }
+  { additionalProperties: false },
 );
 const superAdminSignInSchema = {
   description: 'this will refresh super admin tokens',
@@ -62,13 +62,13 @@ const superAdminSignInSchema = {
     [HTTP_STATUS.OK]: ResponseSchema(
       AuthenticateUserSchema,
       HTTP_STATUS.OK,
-      'token refreshed successfully.'
+      'token refreshed successfully.',
     ),
     [HTTP_STATUS.UNAUTHORIZED]: ErrorResponseSchema(
       HTTP_STATUS.UNAUTHORIZED,
       'FST_JWT_AUTHORIZATION_TOKEN_EXPIRED',
       'Unauthorized',
-      'Authorization token expired'
+      'Authorization token expired',
     ),
   },
 };
@@ -76,9 +76,9 @@ export function POST(fastify: FastifyInstance) {
   return {
     schema: superAdminSignInSchema,
     onRequest: [fastify.authenticateSuperAdminRefresh],
-    handler: async function (
+    async handler(
       request: FastifyRequest & { user: { superAdminId: string } },
-      reply: FastifyReply
+      reply: FastifyReply,
     ) {
       const data = {
         id: request.user.superAdminId,
@@ -87,15 +87,15 @@ export function POST(fastify: FastifyInstance) {
       const promise = getSuperAdminById(fastify.kysely, data);
       const [error, result, ok] = await promiseHandler(promise);
       if (!ok) {
-        const statusCode =
-          error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
+        const statusCode
+          = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
           statusCode,
           message: error.message,
         };
         request.log.error({
           payload: data,
-          error: error,
+          error,
         });
         return reply.status(statusCode).send(errorObject);
       }
@@ -103,10 +103,10 @@ export function POST(fastify: FastifyInstance) {
       const superAdminId = result.id;
 
       const accessToken = fastify.jwt.superAdminAccess.sign({
-        superAdminId: superAdminId,
+        superAdminId,
       });
       const refreshToken = fastify.jwt.superAdminRefresh.sign({
-        superAdminId: superAdminId,
+        superAdminId,
       });
 
       const accessTokenHash = getSha256Hash(accessToken);
@@ -116,17 +116,17 @@ export function POST(fastify: FastifyInstance) {
 
       const accessTokenKey = getSuperAdminAccessTokenKey(
         superAdminId,
-        accessTokenHash
+        accessTokenHash,
       );
       const refreshTokenKey = getSuperAdminRefreshTokenKey(
         superAdminId,
-        refreshTokenHash
+        refreshTokenHash,
       );
 
-      const accessTokenExpiry =
-        parse(fastify.config.SUPER_ADMIN_ACCESS_JWT_EXPIRES_IN) ?? 0;
-      const refreshTokenExpiry =
-        parse(fastify.config.SUPER_ADMIN_REFRESH_JWT_EXPIRES_IN) ?? 0;
+      const accessTokenExpiry
+        = parse(fastify.config.SUPER_ADMIN_ACCESS_JWT_EXPIRES_IN) ?? 0;
+      const refreshTokenExpiry
+        = parse(fastify.config.SUPER_ADMIN_REFRESH_JWT_EXPIRES_IN) ?? 0;
 
       await set(accessTokenKey, accessToken, accessTokenExpiry);
       await set(refreshTokenKey, refreshToken, refreshTokenExpiry);
@@ -148,4 +148,4 @@ export function POST(fastify: FastifyInstance) {
     },
   };
 }
-//#endregion POST
+// #endregion POST

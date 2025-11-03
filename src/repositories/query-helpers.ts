@@ -1,5 +1,5 @@
-import { ExpressionBuilder } from 'kysely';
-import { DB } from 'kysely-codegen';
+import type { DB } from '#src/types/db';
+import type { ExpressionBuilder } from 'kysely';
 import { jsonBuildObject } from 'kysely/helpers/postgres';
 
 export function fileJsonExpression(eb: ExpressionBuilder<DB, 'file'>) {
@@ -13,7 +13,7 @@ export function fileJsonExpression(eb: ExpressionBuilder<DB, 'file'>) {
         url: eb.ref('file.url').$notNull(),
         mimetype: eb.ref('file.mimetype').$notNull(),
         size: eb.ref('file.size').$notNull(),
-      })
+      }),
     )
     .else(eb.val(null))
     .end();

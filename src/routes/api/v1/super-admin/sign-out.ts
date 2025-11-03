@@ -1,3 +1,4 @@
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import {
   EmptyResponseSchema,
   ErrorResponseSchema,
@@ -5,9 +6,8 @@ import {
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { createRedisFunctions } from '#utilities/redis-helpers';
 import { getSuperAdminKeysPattern } from '#utilities/redis-keys';
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-//#region POST
+// #region POST
 const superAdminSignOutSchema = {
   description: 'this will sign out super admin',
   tags: ['v1|super admin'],
@@ -17,13 +17,13 @@ const superAdminSignOutSchema = {
   response: {
     [HTTP_STATUS.OK]: EmptyResponseSchema(
       HTTP_STATUS.OK,
-      'signed out successfully.'
+      'signed out successfully.',
     ),
     [HTTP_STATUS.UNAUTHORIZED]: ErrorResponseSchema(
       HTTP_STATUS.UNAUTHORIZED,
       'FST_JWT_AUTHORIZATION_TOKEN_EXPIRED',
       'Unauthorized',
-      'Authorization token expired'
+      'Authorization token expired',
     ),
   },
 };
@@ -31,9 +31,9 @@ export function POST(fastify: FastifyInstance) {
   return {
     schema: superAdminSignOutSchema,
     onRequest: [fastify.authenticateSuperAdminAccess],
-    handler: async function (
+    async handler(
       request: FastifyRequest & { user: { superAdminId: string } },
-      reply: FastifyReply
+      reply: FastifyReply,
     ) {
       const { superAdminId } = request.user;
 
@@ -52,4 +52,4 @@ export function POST(fastify: FastifyInstance) {
     },
   };
 }
-//#endregion POST
+// #endregion POST

@@ -1,15 +1,17 @@
 /* eslint-disable no-console */
+import fs from 'node:fs';
+import process from 'node:process';
 import { select } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { glob } from 'glob';
-import fs from 'node:fs';
 import { build as pretty } from 'pino-pretty';
 import prettyBytes from 'pretty-bytes';
+
 const logFiles = await glob('logs/*.log');
 
 if (!logFiles.length) {
   console.info(
-    '\n' + chalk.blue(`Info:No Log Files Found In Logs Folder`) + '\n'
+    `\n${chalk.blue(`Info:No Log Files Found In Logs Folder`)}\n`,
   );
   process.exit(0);
 }
@@ -19,7 +21,7 @@ const loggerTypes = [
     logFiles.map((logFiles) => {
       const logFilesSplit = (logFiles.split('\\').pop() as string).split('-');
       return [logFilesSplit[0], logFilesSplit[1]].join('-');
-    })
+    }),
   ),
 ];
 
@@ -27,24 +29,24 @@ const loggerType = await select({
   message: 'Select A Logger Type',
   choices: [
     { name: 'all', value: '' },
-    ...loggerTypes.map((loggerType) => ({
+    ...loggerTypes.map(loggerType => ({
       name: loggerType,
       value: loggerType,
     })),
   ],
 }).catch((e) => {
-  console.error('\n' + chalk.red(`Error: ${e.message}`) + '\n');
+  console.error(`\n${chalk.red(`Error: ${e.message}`)}\n`);
   process.exit(0);
 });
 
 const logFilesObjectPromise = logFiles
-  .filter((logFilePath) => logFilePath.includes(loggerType))
+  .filter(logFilePath => logFilePath.includes(loggerType))
   .map(async (logFilePath) => {
     const fileStats = await fs.promises.stat(logFilePath);
     const fileSize = fileStats.size;
     return {
       name: `name: ${logFilePath.split('\\').pop()} size: ${prettyBytes(
-        fileSize
+        fileSize,
       )}`,
       path: logFilePath,
     };
@@ -54,12 +56,12 @@ const logFilesObject = await Promise.all(logFilesObjectPromise);
 
 const filePath = await select({
   message: 'Select A Log File',
-  choices: logFilesObject.map((logFile) => ({
+  choices: logFilesObject.map(logFile => ({
     name: logFile.name,
     value: logFile.path,
   })),
 }).catch((e) => {
-  console.error('\n' + chalk.red(`Error: ${e.message}`) + '\n');
+  console.error(`\n${chalk.red(`Error: ${e.message}`)}\n`);
   process.exit(0);
 });
 

@@ -1,19 +1,19 @@
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify';
+import type pino from 'pino';
 import fastifyPlugin from 'fastify-plugin';
-import pino from 'pino';
 
-export type FastifyLoggerOptions = {
+export interface FastifyLoggerOptions {
   loggers: Array<{
     logger: pino.Logger<never, boolean>;
     path: string;
   }>;
-};
+}
 
 async function fastifyLogger(
   fastify: FastifyInstance,
-  opts: FastifyLoggerOptions
+  opts: FastifyLoggerOptions,
 ) {
-  fastify.addHook('onRequest', async function (request) {
+  fastify.addHook('onRequest', async (request) => {
     const rawURL = request.raw.url;
     for (const logger of opts.loggers) {
       if (rawURL) {

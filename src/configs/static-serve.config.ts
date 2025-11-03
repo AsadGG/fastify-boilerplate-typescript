@@ -1,8 +1,8 @@
+import type { FastifyStaticOptions } from '@fastify/static';
+import type { ENVSchemaType } from './env.config';
+import { mkdirSync } from 'node:fs';
+import path from 'node:path';
 import { GLOBAL_CONSTANTS } from '#root/global-constants';
-import { FastifyStaticOptions } from '@fastify/static';
-import { mkdirSync } from 'fs';
-import path from 'path';
-import { ENVSchemaType } from './env.config';
 
 function initializeStaticServe() {
   [
@@ -15,11 +15,11 @@ function initializeStaticServe() {
     'presentations',
     'texts',
     'others',
-  ].map((subDirectory) => {
+  ].forEach((subDirectory) => {
     const directory = path.join(
       GLOBAL_CONSTANTS.ROOT_PATH,
       'uploads',
-      subDirectory
+      subDirectory,
     );
 
     mkdirSync(directory, { recursive: true });

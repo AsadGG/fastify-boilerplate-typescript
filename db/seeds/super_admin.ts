@@ -1,6 +1,6 @@
+import type { Kysely } from 'kysely';
+import type { DB } from 'kysely-codegen';
 import bcrypt from 'bcrypt';
-import { Kysely } from 'kysely';
-import { DB } from 'kysely-codegen';
 
 export async function seed(db: Kysely<DB>) {
   const salt = bcrypt.genSaltSync(12);

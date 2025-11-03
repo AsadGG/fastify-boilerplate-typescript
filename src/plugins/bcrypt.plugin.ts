@@ -1,10 +1,11 @@
+import type { FastifyInstance } from 'fastify';
+import type { Buffer } from 'node:buffer';
 import bcrypt from 'bcrypt';
-import { FastifyInstance } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 
-export type bcryptPluginOpts = {
+export interface bcryptPluginOpts {
   saltRounds: number;
-};
+}
 
 async function fastifyBcrypt(fastify: FastifyInstance, opts: bcryptPluginOpts) {
   const saltRounds = opts.saltRounds || 10;
@@ -24,9 +25,8 @@ export default fastifyPlugin(fastifyBcrypt);
 declare module 'fastify' {
   interface FastifyInstance {
     bcrypt: {
-      hash(data: string | Buffer): Promise<string>;
-
-      compare(data: string | Buffer, encrypted: string): Promise<boolean>;
+      hash: (data: string | Buffer) => Promise<string>;
+      compare: (data: string | Buffer, encrypted: string) => Promise<boolean>;
     };
   }
 }

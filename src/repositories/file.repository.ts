@@ -1,6 +1,6 @@
+import type { DB } from '#src/types/db';
+import type { Kysely } from 'kysely';
 import { promiseHandler } from '#utilities/promise-handler';
-import { Kysely } from 'kysely';
-import { DB } from 'kysely-codegen';
 
 export async function createFile(
   kysely: Kysely<DB>,
@@ -9,7 +9,7 @@ export async function createFile(
     mimetype: string;
     size: number;
     url: string;
-  }
+  },
 ) {
   const query = kysely
     .insertInto('file')

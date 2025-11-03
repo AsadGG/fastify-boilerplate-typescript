@@ -1,4 +1,4 @@
-import { FastifyMultipartAttachFieldsToBodyOptions } from '@fastify/multipart';
+import type { FastifyMultipartAttachFieldsToBodyOptions } from '@fastify/multipart';
 
 export function multipartConfig(): FastifyMultipartAttachFieldsToBodyOptions {
   return {
