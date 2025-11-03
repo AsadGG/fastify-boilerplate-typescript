@@ -1,9 +1,10 @@
+import type { LoggerOptions } from 'pino';
+import path from 'node:path';
 import { GLOBAL_CONSTANTS } from '#root/global-constants';
 import camelCase from 'lodash/camelCase.js';
 import kebabCase from 'lodash/kebabCase.js';
 import upperFirst from 'lodash/upperFirst.js';
-import path from 'path';
-import pino, { type LoggerOptions } from 'pino';
+import pino from 'pino';
 
 export function createLogger(moduleName: string) {
   const logFolderPath = path.join(GLOBAL_CONSTANTS.ROOT_PATH, 'logs');
@@ -11,24 +12,24 @@ export function createLogger(moduleName: string) {
 
   const serializers:
     | {
-        [key: string]: pino.SerializerFn;
-      }
+      [key: string]: pino.SerializerFn;
+    }
     | undefined = {
-    request(request) {
-      return {
-        method: request.method,
-        url: request.url,
-        path: request.path,
-        parameters: request.parameters,
-        headers: request.headers,
-      };
-    },
-    reply(reply) {
-      return {
-        statusCode: reply.statusCode,
-      };
-    },
-  };
+      request(request) {
+        return {
+          method: request.method,
+          url: request.url,
+          path: request.path,
+          parameters: request.parameters,
+          headers: request.headers,
+        };
+      },
+      reply(reply) {
+        return {
+          statusCode: reply.statusCode,
+        };
+      },
+    };
 
   const redact = {
     paths: ['request.headers.authorization', '*.password'],

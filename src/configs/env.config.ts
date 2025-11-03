@@ -1,6 +1,7 @@
-import { FastifyEnvOptions } from '@fastify/env';
-import { Static, Type } from '@sinclair/typebox';
-import Ajv from 'ajv';
+import type { FastifyEnvOptions } from '@fastify/env';
+import type { Static } from '@sinclair/typebox';
+import type Ajv from 'ajv';
+import { Type } from '@sinclair/typebox';
 
 const ENV_SCHEMA = Type.Object({
   WEB_SERVER_BIND_ADDRESS: Type.String(),

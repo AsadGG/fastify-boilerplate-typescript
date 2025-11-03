@@ -1,4 +1,4 @@
-import { FastifyKyselyKVStoreOptions } from '#plugins/kysely-kv.plugin';
+import type { FastifyKyselyKVStoreOptions } from '#plugins/kysely-kv.plugin';
 
 function kyselyKVConfig(): FastifyKyselyKVStoreOptions {
   return {

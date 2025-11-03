@@ -1,4 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import process from 'node:process';
+
 const packageJsonExist = existsSync('package.json');
 if (!packageJsonExist) {
   console.error('package.json does not exist');

@@ -1,20 +1,19 @@
-import { sql, type Kysely } from 'kysely';
+import type { Kysely } from 'kysely';
+import { sql } from 'kysely';
 import { createUpdateTimestampTrigger } from '../kysely.utilities';
 
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('todo')
-    .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`uuidv7()`))
-    .addColumn('task', 'text', (col) => col.notNull())
-    .addColumn('completed', 'boolean', (col) => col.defaultTo(false).notNull())
-    .addColumn('is_active', 'boolean', (col) => col.defaultTo(true).notNull())
-    .addColumn('created_at', 'timestamptz', (col) =>
-      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
-    )
-    .addColumn('updated_at', 'timestamptz', (col) =>
-      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
-    )
-    .addColumn('deleted_at', 'timestamptz', (col) => col.defaultTo(null))
+    .addColumn('id', 'uuid', col => col.primaryKey().defaultTo(sql`uuidv7()`))
+    .addColumn('task', 'text', col => col.notNull())
+    .addColumn('completed', 'boolean', col => col.defaultTo(false).notNull())
+    .addColumn('is_active', 'boolean', col => col.defaultTo(true).notNull())
+    .addColumn('created_at', 'timestamptz', col =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull())
+    .addColumn('updated_at', 'timestamptz', col =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull())
+    .addColumn('deleted_at', 'timestamptz', col => col.defaultTo(null))
     .execute();
 
   await db.schema

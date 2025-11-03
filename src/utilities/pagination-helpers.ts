@@ -1,9 +1,9 @@
 export function getLimitAndOffset({ page = 1, size = 10 }) {
-  if (isNaN(parseInt(page.toString()))) {
-    throw new Error('getPaginationObject Error: page must be a number.');
+  if (Number.isNaN(Number.parseInt(page.toString()))) {
+    throw new TypeError('getPaginationObject Error: page must be a number.');
   }
-  if (isNaN(parseInt(size.toString()))) {
-    throw new Error('getPaginationObject Error: size must be a number.');
+  if (Number.isNaN(Number.parseInt(size.toString()))) {
+    throw new TypeError('getPaginationObject Error: size must be a number.');
   }
 
   if (page < 1) {
@@ -17,14 +17,14 @@ export function getLimitAndOffset({ page = 1, size = 10 }) {
 }
 
 export function getPaginationObject({ page = 1, size = 10, total = 0 }) {
-  if (isNaN(parseInt(page.toString()))) {
-    throw new Error('getPaginationObject Error: page must be a number.');
+  if (Number.isNaN(Number.parseInt(page.toString()))) {
+    throw new TypeError('getPaginationObject Error: page must be a number.');
   }
-  if (isNaN(parseInt(size.toString()))) {
-    throw new Error('getPaginationObject Error: size must be a number.');
+  if (Number.isNaN(Number.parseInt(size.toString()))) {
+    throw new TypeError('getPaginationObject Error: size must be a number.');
   }
-  if (isNaN(parseInt(total.toString()))) {
-    throw new Error('getPaginationObject Error: total must be a number.');
+  if (Number.isNaN(Number.parseInt(total.toString()))) {
+    throw new TypeError('getPaginationObject Error: total must be a number.');
   }
 
   if (page < 1) {

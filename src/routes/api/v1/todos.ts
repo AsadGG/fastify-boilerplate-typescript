@@ -1,3 +1,5 @@
+import type { Static } from '@sinclair/typebox';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { createTodo, getTodos } from '#repositories/todo.repository';
 import {
   EmptyResponseSchema,
@@ -8,13 +10,12 @@ import {
 } from '#schemas/common.schema';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { promiseHandler } from '#utilities/promise-handler';
-import { Static, Type } from '@sinclair/typebox';
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { Type } from '@sinclair/typebox';
 
-//#region GET
+// #region GET
 const GetSchemaQuerystring = Type.Composite(
   [PaginationQuerySchema, SearchQuerySchema],
-  { additionalProperties: false }
+  { additionalProperties: false },
 );
 const fetchTodosSchema = {
   description: 'this will fetch todos',
@@ -29,18 +30,18 @@ const fetchTodosSchema = {
         task: Type.String(),
         completed: Type.Boolean(),
       }),
-      HTTP_STATUS.OK
+      HTTP_STATUS.OK,
     ),
   },
 };
 export function GET(fastify: FastifyInstance) {
   return {
     schema: fetchTodosSchema,
-    handler: async function (
+    async handler(
       request: FastifyRequest<{
         Querystring: Static<typeof GetSchemaQuerystring>;
       }>,
-      reply: FastifyReply
+      reply: FastifyReply,
     ) {
       const data = {
         page: request.query.page,
@@ -52,15 +53,15 @@ export function GET(fastify: FastifyInstance) {
       const [error, result, ok] = await promiseHandler(promise);
 
       if (!ok) {
-        const statusCode =
-          error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
+        const statusCode
+          = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
           statusCode,
           message: error.message,
         };
         request.log.error({
           payload: data,
-          error: error,
+          error,
         });
         return reply.status(statusCode).send(errorObject);
       }
@@ -73,14 +74,14 @@ export function GET(fastify: FastifyInstance) {
     },
   };
 }
-//#endregion GET
+// #endregion GET
 
-//#region POST
+// #region POST
 const PostSchemaBody = Type.Object(
   {
     task: Type.String(),
   },
-  { additionalProperties: false }
+  { additionalProperties: false },
 );
 const createTodosSchema = {
   description: 'this will create todo',
@@ -96,22 +97,22 @@ const createTodosSchema = {
         completed: Type.Boolean(),
       }),
       HTTP_STATUS.CREATED,
-      'record created successfully.'
+      'record created successfully.',
     ),
     [HTTP_STATUS.CONFLICT]: EmptyResponseSchema(
       HTTP_STATUS.CONFLICT,
-      'record already exists'
+      'record already exists',
     ),
   },
 };
 export function POST(fastify: FastifyInstance) {
   return {
     schema: createTodosSchema,
-    handler: async function (
+    async handler(
       request: FastifyRequest<{
         Body: Static<typeof PostSchemaBody>;
       }>,
-      reply: FastifyReply
+      reply: FastifyReply,
     ) {
       const data = {
         task: request.body.task,
@@ -121,15 +122,15 @@ export function POST(fastify: FastifyInstance) {
       const [error, result, ok] = await promiseHandler(promise);
 
       if (!ok) {
-        const statusCode =
-          error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
+        const statusCode
+          = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
           statusCode,
           message: error.message,
         };
         request.log.error({
           payload: data,
-          error: error,
+          error,
         });
         return reply.status(statusCode).send(errorObject);
       }
@@ -141,4 +142,4 @@ export function POST(fastify: FastifyInstance) {
     },
   };
 }
-//#endregion POST
+// #endregion POST

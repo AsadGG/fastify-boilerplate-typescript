@@ -1,19 +1,24 @@
+import type { Static } from '@sinclair/typebox';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { writeFile } from 'node:fs/promises';
+import path from 'node:path';
 import { createFile } from '#repositories/file.repository';
 import { GLOBAL_CONSTANTS } from '#root/global-constants';
 import { ResponseSchema } from '#schemas/common.schema';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { promiseHandler } from '#utilities/promise-handler';
-import { Static, Type } from '@sinclair/typebox';
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { writeFile } from 'fs/promises';
-import path from 'path';
+import { Type } from '@sinclair/typebox';
 
 function resolveUploadDirectory(mimetype: string): string {
-  if (!mimetype) return 'others';
+  if (!mimetype)
+    return 'others';
 
-  if (mimetype.startsWith('image/')) return 'images';
-  if (mimetype.startsWith('video/')) return 'videos';
-  if (mimetype.startsWith('audio/')) return 'audios';
+  if (mimetype.startsWith('image/'))
+    return 'images';
+  if (mimetype.startsWith('video/'))
+    return 'videos';
+  if (mimetype.startsWith('audio/'))
+    return 'audios';
 
   switch (mimetype) {
     case 'application/pdf':
@@ -34,12 +39,12 @@ function resolveUploadDirectory(mimetype: string): string {
   }
 }
 
-//#region POST
+// #region POST
 const PostSchemaBody = Type.Object(
   {
     file: Type.Any({ isFile: true }),
   },
-  { additionalProperties: false }
+  { additionalProperties: false },
 );
 const uploadFileSchema = {
   description: 'this will upload file',
@@ -58,18 +63,18 @@ const uploadFileSchema = {
         url: Type.String(),
       }),
       HTTP_STATUS.CREATED,
-      'file uploaded successfully.'
+      'file uploaded successfully.',
     ),
   },
 };
 export function POST(fastify: FastifyInstance) {
   return {
     schema: uploadFileSchema,
-    handler: async function (
+    async handler(
       request: FastifyRequest<{
         Body: Static<typeof PostSchemaBody>;
       }>,
-      reply: FastifyReply
+      reply: FastifyReply,
     ) {
       const { filename, mimetype, buffer, size } = request.body.file;
 
@@ -80,7 +85,7 @@ export function POST(fastify: FastifyInstance) {
       const directory = path.join(
         GLOBAL_CONSTANTS.ROOT_PATH,
         'uploads',
-        uploadSubDirectory
+        uploadSubDirectory,
       );
 
       const filePath = path.join(directory, randomName);
@@ -99,15 +104,15 @@ export function POST(fastify: FastifyInstance) {
       const [error, result, ok] = await promiseHandler(promise);
 
       if (!ok) {
-        const statusCode =
-          error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
+        const statusCode
+          = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
           statusCode,
           message: error.message,
         };
         request.log.error({
           payload: data,
-          error: error,
+          error,
         });
         return reply.status(statusCode).send(errorObject);
       }
@@ -123,4 +128,4 @@ export function POST(fastify: FastifyInstance) {
     },
   };
 }
-//#endregion POST
+// #endregion POST

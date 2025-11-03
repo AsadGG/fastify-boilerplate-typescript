@@ -1,4 +1,5 @@
-import { CustomJWTOptions } from '#configs/jwt.config';
+import type { CustomJWTOptions } from '#configs/jwt.config';
+import type { FastifyInstance } from 'fastify';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import {
   getOfficeUserAccessTokenKey,
@@ -10,29 +11,28 @@ import {
 } from '#utilities/key-helpers';
 import createError from '@fastify/error';
 import fastifyJWT from '@fastify/jwt';
-import { FastifyInstance } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 
 const NoAuthorizationInHeaderError = createError(
   'FST_JWT_NO_AUTHORIZATION_IN_HEADER',
   'No Authorization was found in request.headers',
-  HTTP_STATUS.UNAUTHORIZED
+  HTTP_STATUS.UNAUTHORIZED,
 );
 
 const AuthorizationTokenExpiredError = createError(
   'FST_JWT_AUTHORIZATION_TOKEN_EXPIRED',
   'Authorization token expired',
-  HTTP_STATUS.UNAUTHORIZED
+  HTTP_STATUS.UNAUTHORIZED,
 );
 
 const AuthorizationTokenInvalidError = createError(
   'FST_JWT_AUTHORIZATION_TOKEN_INVALID',
   'Authorization token is invalid. format is Bearer 01234567-89ab-4cde-8f01-23456789abcd:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
-  HTTP_STATUS.UNAUTHORIZED
+  HTTP_STATUS.UNAUTHORIZED,
 );
 
-const TOKEN_PATTERN =
-  /^([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[1-7][0-9A-Fa-f]{3}-[89AaBb][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}):([A-Fa-f0-9]{64})$/;
+const TOKEN_PATTERN
+  = /^([0-9A-F]{8}-[0-9A-F]{4}-[1-7][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}):([A-F0-9]{64})$/i;
 
 async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
   await fastify.register(fastifyJWT, opts.superAdminAccess);
@@ -46,13 +46,13 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
 
   fastify.decorate(
     'authenticateSuperAdminAccess',
-    async function (request, reply) {
+    async (request, reply) => {
       try {
         if (!request.headers.authorization) {
           throw new NoAuthorizationInHeaderError();
         }
         const regExpExecArray = TOKEN_PATTERN.exec(
-          request.headers.authorization.replace('Bearer ', '')
+          request.headers.authorization.replace('Bearer ', ''),
         );
         if (!regExpExecArray) {
           throw new AuthorizationTokenInvalidError();
@@ -65,21 +65,22 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         }
         request.headers.authorization = `Bearer ${token}`;
         await request.superAdminAccessJwtVerify();
-      } catch (err) {
+      }
+      catch (err) {
         reply.send(err);
       }
-    }
+    },
   );
   fastify.decorate(
     'authenticateSuperAdminRefresh',
-    async function (request, reply) {
+    async (request, reply) => {
       try {
         if (!request.headers.authorization) {
           throw new NoAuthorizationInHeaderError();
         }
 
         const regExpExecArray = TOKEN_PATTERN.exec(
-          request.headers.authorization.replace('Bearer ', '')
+          request.headers.authorization.replace('Bearer ', ''),
         );
         if (!regExpExecArray) {
           throw new AuthorizationTokenInvalidError();
@@ -93,22 +94,23 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         await del([key]);
         request.headers.authorization = `Bearer ${token}`;
         await request.superAdminRefreshJwtVerify();
-      } catch (err) {
+      }
+      catch (err) {
         reply.send(err);
       }
-    }
+    },
   );
 
   fastify.decorate(
     'authenticateTenantAdminAccess',
-    async function (request, reply) {
+    async (request, reply) => {
       try {
         if (!request.headers.authorization) {
           throw new NoAuthorizationInHeaderError();
         }
 
         const regExpExecArray = TOKEN_PATTERN.exec(
-          request.headers.authorization.replace('Bearer ', '')
+          request.headers.authorization.replace('Bearer ', ''),
         );
         if (!regExpExecArray) {
           throw new AuthorizationTokenInvalidError();
@@ -118,7 +120,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         const key = getTenantAdminAccessTokenKey(
           tenantId,
           tenantAdminId,
-          tokenHash
+          tokenHash,
         );
         const token = await get(key);
         if (!token) {
@@ -126,21 +128,22 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         }
         request.headers.authorization = `Bearer ${token}`;
         await request.tenantAdminAccessJwtVerify();
-      } catch (err) {
+      }
+      catch (err) {
         reply.send(err);
       }
-    }
+    },
   );
   fastify.decorate(
     'authenticateTenantAdminRefresh',
-    async function (request, reply) {
+    async (request, reply) => {
       try {
         if (!request.headers.authorization) {
           throw new NoAuthorizationInHeaderError();
         }
 
         const regExpExecArray = TOKEN_PATTERN.exec(
-          request.headers.authorization.replace('Bearer ', '')
+          request.headers.authorization.replace('Bearer ', ''),
         );
         if (!regExpExecArray) {
           throw new AuthorizationTokenInvalidError();
@@ -150,7 +153,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         const key = getTenantAdminRefreshTokenKey(
           tenantId,
           tenantAdminId,
-          tokenHash
+          tokenHash,
         );
 
         const token = await get(key);
@@ -160,22 +163,23 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         await del([key]);
         request.headers.authorization = `Bearer ${token}`;
         await request.tenantAdminRefreshJwtVerify();
-      } catch (err) {
+      }
+      catch (err) {
         reply.send(err);
       }
-    }
+    },
   );
 
   fastify.decorate(
     'authenticateOfficeUserAccess',
-    async function (request, reply) {
+    async (request, reply) => {
       try {
         if (!request.headers.authorization) {
           throw new NoAuthorizationInHeaderError();
         }
 
         const regExpExecArray = TOKEN_PATTERN.exec(
-          request.headers.authorization.replace('Bearer ', '')
+          request.headers.authorization.replace('Bearer ', ''),
         );
         if (!regExpExecArray) {
           throw new AuthorizationTokenInvalidError();
@@ -185,7 +189,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         const key = getOfficeUserAccessTokenKey(
           tenantId,
           officeUserId,
-          tokenHash
+          tokenHash,
         );
         const token = await get(key);
         if (!token) {
@@ -193,21 +197,22 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         }
         request.headers.authorization = `Bearer ${token}`;
         await request.officeUserAccessJwtVerify();
-      } catch (err) {
+      }
+      catch (err) {
         reply.send(err);
       }
-    }
+    },
   );
   fastify.decorate(
     'authenticateOfficeUserRefresh',
-    async function (request, reply) {
+    async (request, reply) => {
       try {
         if (!request.headers.authorization) {
           throw new NoAuthorizationInHeaderError();
         }
 
         const regExpExecArray = TOKEN_PATTERN.exec(
-          request.headers.authorization.replace('Bearer ', '')
+          request.headers.authorization.replace('Bearer ', ''),
         );
         if (!regExpExecArray) {
           throw new AuthorizationTokenInvalidError();
@@ -217,7 +222,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         const key = getOfficeUserRefreshTokenKey(
           tenantId,
           officeUserId,
-          tokenHash
+          tokenHash,
         );
         const token = await get(key);
         if (!token) {
@@ -226,10 +231,11 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         await del([key]);
         request.headers.authorization = `Bearer ${token}`;
         await request.officeUserRefreshJwtVerify();
-      } catch (err) {
+      }
+      catch (err) {
         reply.send(err);
       }
-    }
+    },
   );
 }
 
@@ -239,35 +245,35 @@ declare module 'fastify' {
   interface FastifyInstance {
     authenticateSuperAdminAccess: (
       request: FastifyRequest,
-      reply: FastifyReply
+      reply: FastifyReply,
     ) => void;
     authenticateSuperAdminRefresh: (
       request: FastifyRequest,
-      reply: FastifyReply
+      reply: FastifyReply,
     ) => void;
     authenticateTenantAdminAccess: (
       request: FastifyRequest<{
         Params: { tenantId: string };
       }>,
-      reply: FastifyReply
+      reply: FastifyReply,
     ) => void;
     authenticateTenantAdminRefresh: (
       request: FastifyRequest<{
         Params: { tenantId: string };
       }>,
-      reply: FastifyReply
+      reply: FastifyReply,
     ) => void;
     authenticateOfficeUserAccess: (
       request: FastifyRequest<{
         Params: { tenantId: string };
       }>,
-      reply: FastifyReply
+      reply: FastifyReply,
     ) => void;
     authenticateOfficeUserRefresh: (
       request: FastifyRequest<{
         Params: { tenantId: string };
       }>,
-      reply: FastifyReply
+      reply: FastifyReply,
     ) => void;
   }
 
@@ -283,13 +289,13 @@ declare module 'fastify' {
 }
 
 declare module '@fastify/jwt' {
-  type JWTNamespaces =
-    | 'superAdminAccess'
-    | 'superAdminRefresh'
-    | 'tenantAdminAccess'
-    | 'tenantAdminRefresh'
-    | 'officeUserAccess'
-    | 'officeUserRefresh';
+  type JWTNamespaces
+    = | 'superAdminAccess'
+      | 'superAdminRefresh'
+      | 'tenantAdminAccess'
+      | 'tenantAdminRefresh'
+      | 'officeUserAccess'
+      | 'officeUserRefresh';
 
   type OmitNamespacesJWT = Omit<JWT, JWTNamespaces>;
 

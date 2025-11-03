@@ -1,5 +1,5 @@
-import { SwaggerOptions } from '@fastify/swagger';
-import { FastifySwaggerUiOptions } from '@fastify/swagger-ui';
+import type { SwaggerOptions } from '@fastify/swagger';
+import type { FastifySwaggerUiOptions } from '@fastify/swagger-ui';
 
 export function swaggerConfig(): SwaggerOptions {
   return {

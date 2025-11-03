@@ -2,7 +2,7 @@ import { set } from 'date-fns/set';
 
 export function getTimeAsDateTime(
   time: string,
-  date: Date | string | number = new Date()
+  date: Date | string | number = new Date(),
 ) {
   const timeRegex = /^\d{1,2}:\d{2}:\d{2}$/;
   const isValidFormat = timeRegex.test(time);

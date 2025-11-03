@@ -1,11 +1,12 @@
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify';
+import type { Kysely } from 'kysely';
 import fastifyPlugin from 'fastify-plugin';
-import { Kysely, sql } from 'kysely';
+import { sql } from 'kysely';
 
 function getTableQuery(
   table: string,
   useUnloggedTable: boolean,
-  schema: string
+  schema: string,
 ) {
   const schemaTable = `"${schema}"."${table}"`;
   return sql`
@@ -24,21 +25,21 @@ declare module 'fastify' {
       set: <T = unknown>(
         key: string,
         value: T,
-        ttlMs?: number
+        ttlMs?: number,
       ) => Promise<void>;
       del: (keys: string | string[]) => Promise<void>;
       keys: (pattern: string) => Promise<string[]>;
     };
   }
 }
-export type FastifyKyselyKVStoreOptions = {
+export interface FastifyKyselyKVStoreOptions {
   table: string;
   schema?: string;
   useUnloggedTable?: boolean;
-};
+}
 async function fastifyKyselyKVStore(
   fastify: FastifyInstance,
-  opts: FastifyKyselyKVStoreOptions
+  opts: FastifyKyselyKVStoreOptions,
 ) {
   const schema = opts.schema ?? 'public';
   const table = opts.table;
@@ -46,8 +47,8 @@ async function fastifyKyselyKVStore(
 
   if (!('kysely' in fastify)) {
     throw new Error(
-      '[fastify-kysely-kv-store] fastify.kysely not found. ' +
-        'Make sure to register fastify-kysely before this plugin.'
+      '[fastify-kysely-kv-store] fastify.kysely not found. '
+      + 'Make sure to register fastify-kysely before this plugin.',
     );
   }
 
@@ -73,7 +74,8 @@ async function fastifyKyselyKVStore(
         .where('key', '=', key)
         .executeTakeFirst();
 
-      if (!row) return null;
+      if (!row)
+        return null;
 
       if (row.expiresAt && new Date(row.expiresAt) < new Date()) {
         await kvStore.del(key);
@@ -83,7 +85,8 @@ async function fastifyKyselyKVStore(
       try {
         const stringifiedJson = row.value;
         return JSON.parse(stringifiedJson);
-      } catch {
+      }
+      catch {
         await kvStore.del(key);
         return null;
       }
@@ -92,7 +95,7 @@ async function fastifyKyselyKVStore(
     async set<T = unknown>(
       key: string,
       value: T,
-      ttlMs?: number
+      ttlMs?: number,
     ): Promise<void> {
       const stringifiedJson = JSON.stringify(value);
       const expiresAt = ttlMs ? new Date(Date.now() + ttlMs) : null;
@@ -101,15 +104,16 @@ async function fastifyKyselyKVStore(
         .withSchema(schema)
         .insertInto(table)
         .values({ key, value: stringifiedJson, expiresAt })
-        .onConflict((oc) =>
-          oc.column('key').doUpdateSet({ value: stringifiedJson, expiresAt })
+        .onConflict(oc =>
+          oc.column('key').doUpdateSet({ value: stringifiedJson, expiresAt }),
         )
         .execute();
     },
 
     async del(keys: string | string[]): Promise<void> {
       const keysArray = Array.isArray(keys) ? keys : [keys];
-      if (keysArray.length === 0) return;
+      if (keysArray.length === 0)
+        return;
 
       await db
         .withSchema(schema)
@@ -128,7 +132,7 @@ async function fastifyKyselyKVStore(
         .where('key', 'like', sqlPattern)
         .execute();
 
-      return rows.map((r) => r.key);
+      return rows.map(r => r.key);
     },
   };
 

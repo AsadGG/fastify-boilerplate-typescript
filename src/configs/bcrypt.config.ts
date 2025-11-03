@@ -1,4 +1,4 @@
-import { bcryptPluginOpts } from '#plugins/bcrypt.plugin';
+import type { bcryptPluginOpts } from '#plugins/bcrypt.plugin';
 
 export function bcryptConfig(): bcryptPluginOpts {
   return {

@@ -4,21 +4,21 @@ export function getSuperAdminKeysPattern(superAdminId: string) {
 
 export function getSuperAdminAccessTokenKey(
   superAdminId: string,
-  token: string
+  token: string,
 ) {
   return `SUPER_ADMIN:${superAdminId}:ACCESS_TOKEN:${token}`;
 }
 
 export function getSuperAdminRefreshTokenKey(
   superAdminId: string,
-  token: string
+  token: string,
 ) {
   return `SUPER_ADMIN:${superAdminId}:REFRESH_TOKEN:${token}`;
 }
 
 export function getTenantAdminKeysPattern(
   tenantId: string,
-  tenantAdminId: string
+  tenantAdminId: string,
 ) {
   return `TENANT:${tenantId}:TENANT_ADMIN:${tenantAdminId}*`;
 }
@@ -26,7 +26,7 @@ export function getTenantAdminKeysPattern(
 export function getTenantAdminAccessTokenKey(
   tenantId: string,
   tenantAdminId: string,
-  token: string
+  token: string,
 ) {
   return `TENANT:${tenantId}:TENANT_ADMIN:${tenantAdminId}:ACCESS_TOKEN:${token}`;
 }
@@ -34,14 +34,14 @@ export function getTenantAdminAccessTokenKey(
 export function getTenantAdminRefreshTokenKey(
   tenantId: string,
   tenantAdminId: string,
-  token: string
+  token: string,
 ) {
   return `TENANT:${tenantId}:TENANT_ADMIN:${tenantAdminId}:REFRESH_TOKEN:${token}`;
 }
 
 export function getOfficeUserKeysPattern(
   tenantId: string,
-  officeUserId: string
+  officeUserId: string,
 ) {
   return `TENANT:${tenantId}:OFFICE_USER:${officeUserId}*`;
 }
@@ -49,7 +49,7 @@ export function getOfficeUserKeysPattern(
 export function getOfficeUserAccessTokenKey(
   tenantId: string,
   officeUserId: string,
-  token: string
+  token: string,
 ) {
   return `TENANT:${tenantId}:OFFICE_USER:${officeUserId}:ACCESS_TOKEN:${token}`;
 }
@@ -57,7 +57,7 @@ export function getOfficeUserAccessTokenKey(
 export function getOfficeUserRefreshTokenKey(
   tenantId: string,
   officeUserId: string,
-  token: string
+  token: string,
 ) {
   return `TENANT:${tenantId}:OFFICE_USER:${officeUserId}:REFRESH_TOKEN:${token}`;
 }

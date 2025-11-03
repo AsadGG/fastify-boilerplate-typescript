@@ -1,4 +1,4 @@
-import { ENVSchemaType } from '#configs/env.config';
+import type { ENVSchemaType } from '#configs/env.config';
 
 function kyselyConfig(config: ENVSchemaType) {
   return {

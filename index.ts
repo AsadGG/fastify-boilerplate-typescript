@@ -1,3 +1,5 @@
+import type Ajv from 'ajv';
+import process from 'node:process';
 import { bcryptConfig } from '#configs/bcrypt.config';
 import envConfig from '#configs/env.config';
 import { fileRoutesConfig } from '#configs/file-routes.config';
@@ -22,7 +24,6 @@ import fastifyMultipart from '@fastify/multipart';
 import fastifyStaticServe from '@fastify/static';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
-import Ajv from 'ajv';
 import fastify from 'fastify';
 
 process.env.TZ = 'UTC';
@@ -89,7 +90,7 @@ server.get(
   },
   (_request, reply) => {
     return reply.redirect('/api');
-  }
+  },
 );
 
 await server.ready();
@@ -98,8 +99,8 @@ await server.listen({
   host: server.config.WEB_SERVER_BIND_ADDRESS,
   port: server.config.WEB_SERVER_PORT,
   listenTextResolver: () => {
-    const host =
-      server.config.WEB_SERVER_BIND_ADDRESS === '0.0.0.0'
+    const host
+      = server.config.WEB_SERVER_BIND_ADDRESS === '0.0.0.0'
         ? 'localhost'
         : server.config.WEB_SERVER_BIND_ADDRESS;
     return `server is listening at http://${host}:${server.config.WEB_SERVER_PORT}`;

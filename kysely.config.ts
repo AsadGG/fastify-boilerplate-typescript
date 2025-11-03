@@ -1,5 +1,6 @@
+import type { DB } from '#src/types/database';
+import process from 'node:process';
 import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely';
-import type { DB } from 'kysely-codegen';
 import { defineConfig, getKnexTimestampPrefix } from 'kysely-ctl';
 import pg from 'pg';
 

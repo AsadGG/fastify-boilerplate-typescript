@@ -1,12 +1,12 @@
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import {
   EmptyResponseSchema,
   ErrorResponseSchema,
 } from '#schemas/common.schema';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { getSuperAdminKeysPattern } from '#utilities/key-helpers';
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-//#region POST
+// #region POST
 const superAdminSignOutSchema = {
   description: 'this will sign out super admin',
   tags: ['v1|super admin'],
@@ -16,13 +16,13 @@ const superAdminSignOutSchema = {
   response: {
     [HTTP_STATUS.OK]: EmptyResponseSchema(
       HTTP_STATUS.OK,
-      'signed out successfully.'
+      'signed out successfully.',
     ),
     [HTTP_STATUS.UNAUTHORIZED]: ErrorResponseSchema(
       HTTP_STATUS.UNAUTHORIZED,
       'FST_JWT_AUTHORIZATION_TOKEN_EXPIRED',
       'Unauthorized',
-      'Authorization token expired'
+      'Authorization token expired',
     ),
   },
 };
@@ -30,9 +30,9 @@ export function POST(fastify: FastifyInstance) {
   return {
     schema: superAdminSignOutSchema,
     onRequest: [fastify.authenticateSuperAdminAccess],
-    handler: async function (
+    async handler(
       request: FastifyRequest & { user: { superAdminId: string } },
-      reply: FastifyReply
+      reply: FastifyReply,
     ) {
       const { superAdminId } = request.user;
 
@@ -51,4 +51,4 @@ export function POST(fastify: FastifyInstance) {
     },
   };
 }
-//#endregion POST
+// #endregion POST

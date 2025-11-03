@@ -1,3 +1,5 @@
+import type { DB } from '#src/types/database';
+import type { Kysely } from 'kysely';
 import getConflicts from '#utilities/get-conflicts';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import {
@@ -7,19 +9,18 @@ import {
 import { POSTGRES_ERROR_CODES } from '#utilities/postgres_error_codes';
 import { promiseHandler } from '#utilities/promise-handler';
 import createError from '@fastify/error';
-import { Kysely, sql } from 'kysely';
-import { DB } from 'kysely-codegen';
+import { sql } from 'kysely';
 
 const TodoIdNotFoundError = createError(
   'APP_TODO_ID_NOT_FOUND',
-  "todo with id '%s' does not exist",
-  HTTP_STATUS.NOT_FOUND
+  'todo with id \'%s\' does not exist',
+  HTTP_STATUS.NOT_FOUND,
 );
 
 const TodoAlreadyExistsError = createError(
   'APP_TODO_ALREADY_EXISTS',
-  "todo '%s' already exists",
-  HTTP_STATUS.CONFLICT
+  'todo \'%s\' already exists',
+  HTTP_STATUS.CONFLICT,
 );
 
 export async function getTodos(
@@ -28,7 +29,7 @@ export async function getTodos(
     page: number;
     size: number;
     search?: string;
-  }
+  },
 ) {
   const [limit, offset] = getLimitAndOffset({
     page: data.page,
@@ -39,13 +40,14 @@ export async function getTodos(
     .selectFrom('todo')
     .where('deletedAt', 'is', null)
     .$if(Boolean(data.search), (qb) => {
-      if (!data.search || !data.search.trim()) return qb;
+      if (!data.search || !data.search.trim())
+        return qb;
       const searchText = `%${data.search.replace(/[%_]/g, '\\$&')}%`;
       return qb.where('task', 'ilike', searchText);
     });
 
   const countQuery = query
-    .select((eb) => eb.fn.countAll().as('total'))
+    .select(eb => eb.fn.countAll().as('total'))
     .executeTakeFirstOrThrow();
 
   const filteredQuery = query
@@ -57,7 +59,7 @@ export async function getTodos(
     .execute();
 
   const [error, result, ok] = await promiseHandler(
-    Promise.all([filteredQuery, countQuery])
+    Promise.all([filteredQuery, countQuery]),
   );
 
   if (!ok) {
@@ -82,7 +84,7 @@ export async function getTodoById(
   kysely: Kysely<DB>,
   data: {
     todoId: string;
-  }
+  },
 ) {
   const query = kysely
     .selectFrom('todo')
@@ -110,7 +112,7 @@ export async function createTodo(
   kysely: Kysely<DB>,
   data: {
     task: string;
-  }
+  },
 ) {
   const query = kysely
     .insertInto('todo')
@@ -141,7 +143,7 @@ export async function updateTodoById(
   data: {
     todoId: string;
     task: string;
-  }
+  },
 ) {
   const query = kysely
     .updateTable('todo')
@@ -175,7 +177,7 @@ export async function deleteTodoById(
   kysely: Kysely<DB>,
   data: {
     todoId: string;
-  }
+  },
 ) {
   const query = kysely
     .updateTable('todo')
@@ -205,7 +207,7 @@ export async function updateTodoCompletionById(
   data: {
     todoId: string;
     completed: boolean;
-  }
+  },
 ) {
   const query = kysely
     .updateTable('todo')
