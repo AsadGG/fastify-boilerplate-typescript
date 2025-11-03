@@ -43,7 +43,7 @@ importers:
         version: 9.5.2
       '@fastify/swagger-ui':
         specifier: github:AsadGG/fastify-swagger-ui
-        version: https://codeload.github.com/AsadGG/fastify-swagger-ui/tar.gz/f30cec69a2513443f8494aafcee20ba21a8adbdb
+        version: https://codeload.github.com/AsadGG/fastify-swagger-ui/tar.gz/7f62f86d7d30471c795b165780f90d2768811d9a
       '@lukeed/ms':
         specifier: ^2.0.2
         version: 2.0.2
@@ -509,8 +509,8 @@ packages:
   '@fastify/static@8.3.0':
     resolution: {integrity: sha512-yKxviR5PH1OKNnisIzZKmgZSus0r2OZb8qCSbqmw34aolT4g3UlzYfeBRym+HJ1J471CR8e2ldNub4PubD1coA==}
 
-  '@fastify/swagger-ui@https://codeload.github.com/AsadGG/fastify-swagger-ui/tar.gz/f30cec69a2513443f8494aafcee20ba21a8adbdb':
-    resolution: {tarball: https://codeload.github.com/AsadGG/fastify-swagger-ui/tar.gz/f30cec69a2513443f8494aafcee20ba21a8adbdb}
+  '@fastify/swagger-ui@https://codeload.github.com/AsadGG/fastify-swagger-ui/tar.gz/7f62f86d7d30471c795b165780f90d2768811d9a':
+    resolution: {tarball: https://codeload.github.com/AsadGG/fastify-swagger-ui/tar.gz/7f62f86d7d30471c795b165780f90d2768811d9a}
     version: 5.2.3
 
   '@fastify/swagger@9.5.2':
@@ -2991,7 +2991,7 @@ snapshots:
       fastq: 1.19.1
       glob: 11.0.3
 
-  '@fastify/swagger-ui@https://codeload.github.com/AsadGG/fastify-swagger-ui/tar.gz/f30cec69a2513443f8494aafcee20ba21a8adbdb':
+  '@fastify/swagger-ui@https://codeload.github.com/AsadGG/fastify-swagger-ui/tar.gz/7f62f86d7d30471c795b165780f90d2768811d9a':
     dependencies:
       '@fastify/static': 8.3.0
       fastify-plugin: 5.1.0
