@@ -1,5 +1,5 @@
+import type { DB } from '#src/types/database';
 import type { FastifyInstance } from 'fastify';
-import type { DB } from 'kysely-codegen';
 import type { PoolConfig } from 'pg';
 import fastifyPlugin from 'fastify-plugin';
 import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely';

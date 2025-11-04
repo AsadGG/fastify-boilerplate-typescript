@@ -3,7 +3,7 @@
  * Please do not edit it manually.
  */
 
-import type { ColumnType } from "kysely";
+import type { ColumnType } from 'kysely';
 
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
@@ -19,6 +19,12 @@ export interface File {
   mimetype: string;
   size: Int8;
   url: string;
+}
+
+export interface KeyValueStore {
+  expiresAt: Timestamp | null;
+  key: string;
+  value: string;
 }
 
 export interface SuperAdmin {
@@ -42,6 +48,7 @@ export interface Todo {
 
 export interface DB {
   file: File;
+  keyValueStore: KeyValueStore;
   superAdmin: SuperAdmin;
   todo: Todo;
 }

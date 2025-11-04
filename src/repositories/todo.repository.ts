@@ -1,4 +1,4 @@
-import type { DB } from '#src/types/db';
+import type { DB } from '#src/types/database';
 import type { Kysely } from 'kysely';
 import getConflicts from '#utilities/get-conflicts';
 import HTTP_STATUS from '#utilities/http-status-codes';

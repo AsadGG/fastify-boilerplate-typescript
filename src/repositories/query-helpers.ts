@@ -1,4 +1,4 @@
-import type { DB } from '#src/types/db';
+import type { DB } from '#src/types/database';
 import type { ExpressionBuilder } from 'kysely';
 import { jsonBuildObject } from 'kysely/helpers/postgres';
 

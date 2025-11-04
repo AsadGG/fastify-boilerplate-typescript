@@ -30,7 +30,7 @@
     "seed:list": "kysely seed list",
     "build": "tsc && tsx post-build.ts",
     "check": "tsc --noEmit",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix --cache"
   },
   "dependencies": {
     "@fastify/autoload": "^6.3.1",
