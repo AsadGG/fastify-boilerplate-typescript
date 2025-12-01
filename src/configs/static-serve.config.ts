@@ -29,7 +29,7 @@ function initializeStaticServe() {
 export function staticServeConfig(config: ENVSchemaType): FastifyStaticOptions {
   initializeStaticServe();
   return {
-    root: path.join(GLOBAL_CONSTANTS.ROOT_PATH, config.STATIC_SERVE_FOLDER),
     prefix: config.STATIC_SERVE_PREFIX,
+    root: path.join(GLOBAL_CONSTANTS.ROOT_PATH, config.STATIC_SERVE_FOLDER),
   };
 }

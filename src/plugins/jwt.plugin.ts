@@ -42,7 +42,7 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
   await fastify.register(fastifyJWT, opts.officeUserAccess);
   await fastify.register(fastifyJWT, opts.officeUserRefresh);
 
-  const { get, del } = fastify.kvStore;
+  const { del, get } = fastify.kvStore;
 
   fastify.decorate(
     'authenticateSuperAdminAccess',
@@ -243,6 +243,18 @@ export default fastifyPlugin(myFastifyJWT);
 
 declare module 'fastify' {
   interface FastifyInstance {
+    authenticateOfficeUserAccess: (
+      request: FastifyRequest<{
+        Params: { tenantId: string };
+      }>,
+      reply: FastifyReply,
+    ) => void;
+    authenticateOfficeUserRefresh: (
+      request: FastifyRequest<{
+        Params: { tenantId: string };
+      }>,
+      reply: FastifyReply,
+    ) => void;
     authenticateSuperAdminAccess: (
       request: FastifyRequest,
       reply: FastifyReply,
@@ -263,48 +275,36 @@ declare module 'fastify' {
       }>,
       reply: FastifyReply,
     ) => void;
-    authenticateOfficeUserAccess: (
-      request: FastifyRequest<{
-        Params: { tenantId: string };
-      }>,
-      reply: FastifyReply,
-    ) => void;
-    authenticateOfficeUserRefresh: (
-      request: FastifyRequest<{
-        Params: { tenantId: string };
-      }>,
-      reply: FastifyReply,
-    ) => void;
   }
 
   interface FastifyRequest {
+    officeUserAccessJwtVerify: () => Promise<void>;
+    officeUserRefreshJwtVerify: () => Promise<void>;
     superAdminAccess: () => Promise<void>;
     superAdminAccessJwtVerify: () => Promise<void>;
     superAdminRefreshJwtVerify: () => Promise<void>;
     tenantAdminAccessJwtVerify: () => Promise<void>;
     tenantAdminRefreshJwtVerify: () => Promise<void>;
-    officeUserAccessJwtVerify: () => Promise<void>;
-    officeUserRefreshJwtVerify: () => Promise<void>;
   }
 }
 
 declare module '@fastify/jwt' {
   type JWTNamespaces
-    = | 'superAdminAccess'
+    = | 'officeUserAccess'
+      | 'officeUserRefresh'
+      | 'superAdminAccess'
       | 'superAdminRefresh'
       | 'tenantAdminAccess'
-      | 'tenantAdminRefresh'
-      | 'officeUserAccess'
-      | 'officeUserRefresh';
+      | 'tenantAdminRefresh';
 
   type OmitNamespacesJWT = Omit<JWT, JWTNamespaces>;
 
   interface JWT {
+    officeUserAccess: OmitNamespacesJWT;
+    officeUserRefresh: OmitNamespacesJWT;
     superAdminAccess: OmitNamespacesJWT;
     superAdminRefresh: OmitNamespacesJWT;
     tenantAdminAccess: OmitNamespacesJWT;
     tenantAdminRefresh: OmitNamespacesJWT;
-    officeUserAccess: OmitNamespacesJWT;
-    officeUserRefresh: OmitNamespacesJWT;
   }
 }

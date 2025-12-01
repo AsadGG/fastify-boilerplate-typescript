@@ -30,29 +30,29 @@ process.env.TZ = 'UTC';
 
 function ajvFilePlugin(ajv: Ajv) {
   return ajv.addKeyword({
-    keyword: 'isFile',
     compile: (_schema, parent) => {
       parent.type = 'file';
       delete parent.isFile;
       return () => true;
     },
+    keyword: 'isFile',
   });
 }
 
 const systemLogger = createLogger('SYSTEM_LOGGER');
 const server = fastify({
   genReqId: () => crypto.randomUUID(),
-  loggerInstance: systemLogger,
   ajv: {
-    plugins: [ajvFilePlugin],
     customOptions: {
-      keywords: ['collectionFormat'],
-      coerceTypes: 'array',
-      useDefaults: true,
-      removeAdditional: true,
       allErrors: true,
+      coerceTypes: 'array',
+      keywords: ['collectionFormat'],
+      removeAdditional: true,
+      useDefaults: true,
     },
+    plugins: [ajvFilePlugin],
   },
+  loggerInstance: systemLogger,
 });
 
 await server.register(fastifyEnv, envConfig());
@@ -97,7 +97,6 @@ await server.ready();
 
 await server.listen({
   host: server.config.WEB_SERVER_BIND_ADDRESS,
-  port: server.config.WEB_SERVER_PORT,
   listenTextResolver: () => {
     const host
       = server.config.WEB_SERVER_BIND_ADDRESS === '0.0.0.0'
@@ -105,6 +104,7 @@ await server.listen({
         : server.config.WEB_SERVER_BIND_ADDRESS;
     return `server is listening at http://${host}:${server.config.WEB_SERVER_PORT}`;
   },
+  port: server.config.WEB_SERVER_PORT,
 });
 
 function gracefulShutdown() {

@@ -4,46 +4,46 @@ import type { FastifySwaggerUiOptions } from '@fastify/swagger-ui';
 export function swaggerConfig(): SwaggerOptions {
   return {
     openapi: {
-      openapi: '3.0.0',
-      info: {
-        title: 'My Fastify App Documentation Title',
-        description: 'My FirstApp Backend Documentation Description',
-        version: '1.0.0',
-      },
       components: {
         securitySchemes: {
-          AuthorizationSuperAdminAccess: {
-            type: 'apiKey',
-            name: 'Authorization',
-            in: 'header',
-          },
-          AuthorizationSuperAdminRefresh: {
-            type: 'apiKey',
-            name: 'Authorization',
-            in: 'header',
-          },
-          AuthorizationTenantAdminAccess: {
-            type: 'apiKey',
-            name: 'Authorization',
-            in: 'header',
-          },
-          AuthorizationTenantAdminRefresh: {
-            type: 'apiKey',
-            name: 'Authorization',
-            in: 'header',
-          },
           AuthorizationOfficeUserAccess: {
             type: 'apiKey',
-            name: 'Authorization',
             in: 'header',
+            name: 'Authorization',
           },
           AuthorizationOfficeUserRefresh: {
             type: 'apiKey',
-            name: 'Authorization',
             in: 'header',
+            name: 'Authorization',
+          },
+          AuthorizationSuperAdminAccess: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'Authorization',
+          },
+          AuthorizationSuperAdminRefresh: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'Authorization',
+          },
+          AuthorizationTenantAdminAccess: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'Authorization',
+          },
+          AuthorizationTenantAdminRefresh: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'Authorization',
           },
         },
       },
+      info: {
+        description: 'My FirstApp Backend Documentation Description',
+        title: 'My Fastify App Documentation Title',
+        version: '1.0.0',
+      },
+      openapi: '3.0.0',
     },
   };
 }
@@ -64,14 +64,14 @@ export function swaggerUIConfig(): FastifySwaggerUiOptions {
     theme: {
       css: [
         {
-          filename: 'custom-font-and-input-field-size.css',
           content: CSS_CONTENT,
+          filename: 'custom-font-and-input-field-size.css',
         },
       ],
     },
     uiConfig: {
-      docExpansion: 'list',
       deepLinking: true,
+      docExpansion: 'list',
       persistAuthorization: true,
     },
   };

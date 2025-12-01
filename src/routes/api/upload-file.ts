@@ -47,12 +47,10 @@ const PostSchemaBody = Type.Object(
   { additionalProperties: false },
 );
 const uploadFileSchema = {
-  description: 'this will upload file',
-  tags: ['upload file'],
-  summary: 'upload file',
   operationId: 'uploadFile',
-  consumes: ['multipart/form-data'],
   body: PostSchemaBody,
+  consumes: ['multipart/form-data'],
+  description: 'this will upload file',
   response: {
     [HTTP_STATUS.CREATED]: ResponseSchema(
       Type.Object({
@@ -66,17 +64,18 @@ const uploadFileSchema = {
       'file uploaded successfully.',
     ),
   },
+  summary: 'upload file',
+  tags: ['upload file'],
 };
 export function POST(fastify: FastifyInstance) {
   return {
-    schema: uploadFileSchema,
     async handler(
       request: FastifyRequest<{
         Body: Static<typeof PostSchemaBody>;
       }>,
       reply: FastifyReply,
     ) {
-      const { filename, mimetype, buffer, size } = request.body.file;
+      const { buffer, filename, mimetype, size } = request.body.file;
 
       const randomName = `${crypto.randomUUID()}.${filename.split('.').pop()}`;
 
@@ -107,25 +106,26 @@ export function POST(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          statusCode,
           message: error.message,
+          statusCode,
         };
         request.log.error({
-          payload: data,
           error,
+          payload: data,
         });
         return reply.status(statusCode).send(errorObject);
       }
 
       return reply.status(HTTP_STATUS.CREATED).send({
-        statusCode: HTTP_STATUS.CREATED,
-        message: 'file uploaded successfully.',
         data: {
           ...result.record,
           url: `${fastify.config.WEB_SERVER_BASE_URL}${url}`,
         },
+        message: 'file uploaded successfully.',
+        statusCode: HTTP_STATUS.CREATED,
       });
     },
+    schema: uploadFileSchema,
   };
 }
 // #endregion POST

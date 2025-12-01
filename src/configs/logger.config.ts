@@ -7,8 +7,8 @@ const adminLogger = createLogger('ADMIN_LOGGER');
 export function loggerConfig(): FastifyLoggerOptions {
   return {
     loggers: [
-      { path: '/api/v1/user', logger: userLogger },
-      { path: '/api/v1/admin', logger: adminLogger },
+      { logger: userLogger, path: '/api/v1/user' },
+      { logger: adminLogger, path: '/api/v1/admin' },
     ],
   };
 }

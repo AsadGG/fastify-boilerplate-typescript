@@ -21,8 +21,8 @@ const db = new Kysely<DB>({
 export default defineConfig({
   kysely: db,
   migrations: {
-    migrationFolder: `./db/migrations`,
     getMigrationPrefix: getKnexTimestampPrefix,
+    migrationFolder: `./db/migrations`,
   },
   seeds: {
     seedFolder: `./db/seeds`,

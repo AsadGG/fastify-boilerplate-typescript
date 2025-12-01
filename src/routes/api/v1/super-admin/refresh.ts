@@ -15,27 +15,27 @@ import { Type } from '@sinclair/typebox';
 const AuthenticateUserSchema = Type.Object(
   {
     id: Type.String({
-      format: 'uuid',
       description: 'unique identifier of the user',
+      format: 'uuid',
     }),
+    email: Type.String({ description: 'email address', format: 'email' }),
+    image: Type.Union([
+      Type.Object({
+        filename: Type.String({ examples: ['profile-picture.png'] }),
+        mimetype: Type.String({ examples: ['image/png'] }),
+        size: Type.Number({ examples: [8192] }),
+        url: Type.String({ format: 'uri' }),
+      }),
+      Type.Null(),
+    ]),
     name: Type.String({
       description: 'full name of the user',
       examples: ['John doe'],
     }),
-    email: Type.String({ format: 'email', description: 'email address' }),
     phone: Type.String({
       description: 'phone number',
       examples: ['03001234567'],
     }),
-    image: Type.Union([
-      Type.Object({
-        filename: Type.String({ examples: ['profile-picture.png'] }),
-        url: Type.String({ format: 'uri' }),
-        mimetype: Type.String({ examples: ['image/png'] }),
-        size: Type.Number({ examples: [8192] }),
-      }),
-      Type.Null(),
-    ]),
     accessToken: Type.String({
       description: 'access token used for authentication',
       examples: [
@@ -52,11 +52,8 @@ const AuthenticateUserSchema = Type.Object(
   { additionalProperties: false },
 );
 const superAdminSignInSchema = {
-  description: 'this will refresh super admin tokens',
-  tags: ['v1|super admin'],
-  summary: 'super admin refresh',
-  security: [{ AuthorizationSuperAdminRefresh: [] }],
   operationId: 'superAdminRefresh',
+  description: 'this will refresh super admin tokens',
   response: {
     [HTTP_STATUS.OK]: ResponseSchema(
       AuthenticateUserSchema,
@@ -70,11 +67,12 @@ const superAdminSignInSchema = {
       'Authorization token expired',
     ),
   },
+  security: [{ AuthorizationSuperAdminRefresh: [] }],
+  summary: 'super admin refresh',
+  tags: ['v1|super admin'],
 };
 export function POST(fastify: FastifyInstance) {
   return {
-    schema: superAdminSignInSchema,
-    onRequest: [fastify.authenticateSuperAdminRefresh],
     async handler(
       request: FastifyRequest & { user: { superAdminId: string } },
       reply: FastifyReply,
@@ -89,12 +87,12 @@ export function POST(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          statusCode,
           message: error.message,
+          statusCode,
         };
         request.log.error({
-          payload: data,
           error,
+          payload: data,
         });
         return reply.status(statusCode).send(errorObject);
       }
@@ -135,16 +133,18 @@ export function POST(fastify: FastifyInstance) {
       }
 
       return reply.status(HTTP_STATUS.OK).send({
-        statusCode: HTTP_STATUS.OK,
-        message: 'token refreshed successfully.',
         data: {
           ...result,
           password: undefined,
           accessToken: `${superAdminId}:${accessTokenHash}`,
           refreshToken: `${superAdminId}:${refreshTokenHash}`,
         },
+        message: 'token refreshed successfully.',
+        statusCode: HTTP_STATUS.OK,
       });
     },
+    onRequest: [fastify.authenticateSuperAdminRefresh],
+    schema: superAdminSignInSchema,
   };
 }
 // #endregion POST

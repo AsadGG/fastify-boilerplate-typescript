@@ -2,8 +2,8 @@ import type { FastifyKyselyKVStoreOptions } from '#plugins/kysely-kv.plugin';
 
 function kyselyKVConfig(): FastifyKyselyKVStoreOptions {
   return {
-    table: 'key_value_store',
     schema: 'public',
+    table: 'key_value_store',
     useUnloggedTable: true,
   };
 }

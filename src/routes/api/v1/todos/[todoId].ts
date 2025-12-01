@@ -18,29 +18,28 @@ const GetSchemaParams = Type.Object(
   { additionalProperties: false },
 );
 const fetchTodoSchema = {
-  description: 'this will fetch todo',
-  tags: ['v1|todos'],
-  summary: 'fetch todo',
   operationId: 'getTodo',
+  description: 'this will fetch todo',
   params: GetSchemaParams,
   response: {
-    [HTTP_STATUS.OK]: ResponseSchema(
-      Type.Object({
-        id: Type.String({ format: 'uuid' }),
-        task: Type.String(),
-        completed: Type.Boolean(),
-      }),
-      HTTP_STATUS.OK,
-    ),
     [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
       HTTP_STATUS.NOT_FOUND,
       'record does not exist',
     ),
+    [HTTP_STATUS.OK]: ResponseSchema(
+      Type.Object({
+        id: Type.String({ format: 'uuid' }),
+        completed: Type.Boolean(),
+        task: Type.String(),
+      }),
+      HTTP_STATUS.OK,
+    ),
   },
+  summary: 'fetch todo',
+  tags: ['v1|todos'],
 };
 export function GET(fastify: FastifyInstance) {
   return {
-    schema: fetchTodoSchema,
     async handler(
       request: FastifyRequest<{
         Params: Static<typeof GetSchemaParams>;
@@ -58,21 +57,22 @@ export function GET(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          statusCode,
           message: error.message,
+          statusCode,
         };
         request.log.error({
-          payload: data,
           error,
+          payload: data,
         });
         return reply.status(statusCode).send(errorObject);
       }
       return reply.status(HTTP_STATUS.OK).send({
-        statusCode: HTTP_STATUS.OK,
-        message: 'todo fetched successfully.',
         data: result.record,
+        message: 'todo fetched successfully.',
+        statusCode: HTTP_STATUS.OK,
       });
     },
+    schema: fetchTodoSchema,
   };
 }
 // #endregion GET
@@ -91,38 +91,37 @@ const PatchSchemaBody = Type.Object(
   { additionalProperties: false },
 );
 const updateTodoSchema = {
-  description: 'this will update todo',
-  tags: ['v1|todos'],
-  summary: 'update todo',
   operationId: 'updateTodo',
-  params: PatchSchemaParams,
   body: PatchSchemaBody,
+  description: 'this will update todo',
+  params: PatchSchemaParams,
   response: {
-    [HTTP_STATUS.OK]: ResponseSchema(
-      Type.Object({
-        id: Type.String({ format: 'uuid' }),
-        task: Type.String(),
-        completed: Type.Boolean(),
-      }),
-      HTTP_STATUS.OK,
+    [HTTP_STATUS.CONFLICT]: EmptyResponseSchema(
+      HTTP_STATUS.CONFLICT,
+      'record already exists',
     ),
     [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
       HTTP_STATUS.NOT_FOUND,
       'record does not exist',
     ),
-    [HTTP_STATUS.CONFLICT]: EmptyResponseSchema(
-      HTTP_STATUS.CONFLICT,
-      'record already exists',
+    [HTTP_STATUS.OK]: ResponseSchema(
+      Type.Object({
+        id: Type.String({ format: 'uuid' }),
+        completed: Type.Boolean(),
+        task: Type.String(),
+      }),
+      HTTP_STATUS.OK,
     ),
   },
+  summary: 'update todo',
+  tags: ['v1|todos'],
 };
 export function PATCH(fastify: FastifyInstance) {
   return {
-    schema: updateTodoSchema,
     async handler(
       request: FastifyRequest<{
-        Params: Static<typeof GetSchemaParams>;
         Body: Static<typeof PatchSchemaBody>;
+        Params: Static<typeof GetSchemaParams>;
       }>,
       reply: FastifyReply,
     ) {
@@ -138,21 +137,22 @@ export function PATCH(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          statusCode,
           message: error.message,
+          statusCode,
         };
         request.log.error({
-          payload: data,
           error,
+          payload: data,
         });
         return reply.status(statusCode).send(errorObject);
       }
       return reply.status(HTTP_STATUS.OK).send({
-        statusCode: HTTP_STATUS.OK,
-        message: 'todo updated successfully.',
         data: result.record,
+        message: 'todo updated successfully.',
+        statusCode: HTTP_STATUS.OK,
       });
     },
+    schema: updateTodoSchema,
   };
 }
 // #endregion PATCH
@@ -166,12 +166,14 @@ const DeleteSchemaParams = Type.Object(
 );
 
 const deleteTodoSchema = {
-  description: 'this will delete todo',
-  tags: ['v1|todos'],
-  summary: 'delete todo',
   operationId: 'deleteTodo',
+  description: 'this will delete todo',
   params: DeleteSchemaParams,
   response: {
+    [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
+      HTTP_STATUS.NOT_FOUND,
+      'record does not exist',
+    ),
     [HTTP_STATUS.OK]: ResponseSchema(
       Type.Object({
         id: Type.String({ format: 'uuid' }),
@@ -179,15 +181,12 @@ const deleteTodoSchema = {
       HTTP_STATUS.OK,
       'record deleted successfully.',
     ),
-    [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
-      HTTP_STATUS.NOT_FOUND,
-      'record does not exist',
-    ),
   },
+  summary: 'delete todo',
+  tags: ['v1|todos'],
 };
 export function DELETE(fastify: FastifyInstance) {
   return {
-    schema: deleteTodoSchema,
     async handler(
       request: FastifyRequest<{
         Params: Static<typeof GetSchemaParams>;
@@ -205,21 +204,22 @@ export function DELETE(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          statusCode,
           message: error.message,
+          statusCode,
         };
         request.log.error({
-          payload: data,
           error,
+          payload: data,
         });
         return reply.status(statusCode).send(errorObject);
       }
       return reply.status(HTTP_STATUS.OK).send({
-        statusCode: HTTP_STATUS.OK,
-        message: 'todo deleted successfully.',
         data: result.record,
+        message: 'todo deleted successfully.',
+        statusCode: HTTP_STATUS.OK,
       });
     },
+    schema: deleteTodoSchema,
   };
 }
 // #endregion DELETE

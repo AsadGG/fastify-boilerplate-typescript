@@ -21,20 +21,20 @@ function getTableQuery(
 declare module 'fastify' {
   interface FastifyInstance {
     kvStore: {
+      del: (keys: string | string[]) => Promise<void>;
       get: <T = unknown>(key: string) => Promise<T | null>;
+      keys: (pattern: string) => Promise<string[]>;
       set: <T = unknown>(
         key: string,
         value: T,
         ttlMs?: number,
       ) => Promise<void>;
-      del: (keys: string | string[]) => Promise<void>;
-      keys: (pattern: string) => Promise<string[]>;
     };
   }
 }
 export interface FastifyKyselyKVStoreOptions {
-  table: string;
   schema?: string;
+  table: string;
   useUnloggedTable?: boolean;
 }
 async function fastifyKyselyKVStore(
@@ -66,6 +66,18 @@ async function fastifyKyselyKVStore(
   }
 
   const kvStore = {
+    async del(keys: string | string[]): Promise<void> {
+      const keysArray = Array.isArray(keys) ? keys : [keys];
+      if (keysArray.length === 0)
+        return;
+
+      await db
+        .withSchema(schema)
+        .deleteFrom(table)
+        .where('key', 'in', keysArray)
+        .execute();
+    },
+
     async get<T = unknown>(key: string): Promise<T | null> {
       const row = await db
         .withSchema(schema)
@@ -92,36 +104,6 @@ async function fastifyKyselyKVStore(
       }
     },
 
-    async set<T = unknown>(
-      key: string,
-      value: T,
-      ttlMs?: number,
-    ): Promise<void> {
-      const stringifiedJson = JSON.stringify(value);
-      const expiresAt = ttlMs ? new Date(Date.now() + ttlMs) : null;
-
-      await db
-        .withSchema(schema)
-        .insertInto(table)
-        .values({ key, value: stringifiedJson, expiresAt })
-        .onConflict(oc =>
-          oc.column('key').doUpdateSet({ value: stringifiedJson, expiresAt }),
-        )
-        .execute();
-    },
-
-    async del(keys: string | string[]): Promise<void> {
-      const keysArray = Array.isArray(keys) ? keys : [keys];
-      if (keysArray.length === 0)
-        return;
-
-      await db
-        .withSchema(schema)
-        .deleteFrom(table)
-        .where('key', 'in', keysArray)
-        .execute();
-    },
-
     async keys(pattern: string): Promise<string[]> {
       const sqlPattern = pattern.replace(/\*/g, '%');
 
@@ -134,12 +116,30 @@ async function fastifyKyselyKVStore(
 
       return rows.map(r => r.key);
     },
+
+    async set<T = unknown>(
+      key: string,
+      value: T,
+      ttlMs?: number,
+    ): Promise<void> {
+      const stringifiedJson = JSON.stringify(value);
+      const expiresAt = ttlMs ? new Date(Date.now() + ttlMs) : null;
+
+      await db
+        .withSchema(schema)
+        .insertInto(table)
+        .values({ expiresAt, key, value: stringifiedJson })
+        .onConflict(oc =>
+          oc.column('key').doUpdateSet({ expiresAt, value: stringifiedJson }),
+        )
+        .execute();
+    },
   };
 
   fastify.decorate('kvStore', kvStore);
 }
 
 export default fastifyPlugin(fastifyKyselyKVStore, {
-  name: 'fastify-kysely-kv-store',
   dependencies: ['fastify-kysely'],
+  name: 'fastify-kysely-kv-store',
 });

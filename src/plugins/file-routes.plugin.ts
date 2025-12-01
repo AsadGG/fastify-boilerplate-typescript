@@ -96,8 +96,8 @@ async function collectRoutes(
 }
 
 interface FileRoutesOptions {
-  routesFolder: string;
   pathPrefix?: string;
+  routesFolder: string;
 }
 async function fileRoutes(server: FastifyInstance, opts: FileRoutesOptions) {
   if (!opts?.routesFolder) {

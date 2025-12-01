@@ -14,30 +14,29 @@ const PatchSchemaParams = Type.Object(
   { additionalProperties: false },
 );
 const completeTodoSchema = {
-  description: 'this will mark todo as complete',
-  tags: ['v1|todos'],
-  summary: 'mark todo as complete',
   operationId: 'completeTodo',
+  description: 'this will mark todo as complete',
   params: PatchSchemaParams,
   response: {
-    [HTTP_STATUS.OK]: ResponseSchema(
-      Type.Object({
-        id: Type.String({ format: 'uuid' }),
-        task: Type.String(),
-        completed: Type.Boolean({ examples: [true] }),
-      }),
-      HTTP_STATUS.OK,
-      'record marked as complete',
-    ),
     [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
       HTTP_STATUS.NOT_FOUND,
       'record does not exist',
     ),
+    [HTTP_STATUS.OK]: ResponseSchema(
+      Type.Object({
+        id: Type.String({ format: 'uuid' }),
+        completed: Type.Boolean({ examples: [true] }),
+        task: Type.String(),
+      }),
+      HTTP_STATUS.OK,
+      'record marked as complete',
+    ),
   },
+  summary: 'mark todo as complete',
+  tags: ['v1|todos'],
 };
 export function PATCH(fastify: FastifyInstance) {
   return {
-    schema: completeTodoSchema,
     async handler(
       request: FastifyRequest<{
         Params: Static<typeof PatchSchemaParams>;
@@ -56,21 +55,22 @@ export function PATCH(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          statusCode,
           message: error.message,
+          statusCode,
         };
         request.log.error({
-          payload: data,
           error,
+          payload: data,
         });
         return reply.status(statusCode).send(errorObject);
       }
       return reply.status(HTTP_STATUS.OK).send({
-        statusCode: HTTP_STATUS.OK,
-        message: 'todo marked as complete successfully.',
         data: result.record,
+        message: 'todo marked as complete successfully.',
+        statusCode: HTTP_STATUS.OK,
       });
     },
+    schema: completeTodoSchema,
   };
 }
 // #endregion PATCH

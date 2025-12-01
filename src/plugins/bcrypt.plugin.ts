@@ -14,7 +14,7 @@ async function fastifyBcrypt(fastify: FastifyInstance, opts: bcryptPluginOpts) {
     compare(data, hash) {
       return bcrypt.compare(data, hash);
     },
-    hash(data: string | Buffer) {
+    hash(data: Buffer | string) {
       return bcrypt.hash(data, salt);
     },
   });
@@ -25,8 +25,8 @@ export default fastifyPlugin(fastifyBcrypt);
 declare module 'fastify' {
   interface FastifyInstance {
     bcrypt: {
-      hash: (data: string | Buffer) => Promise<string>;
-      compare: (data: string | Buffer, encrypted: string) => Promise<boolean>;
+      compare: (data: Buffer | string, encrypted: string) => Promise<boolean>;
+      hash: (data: Buffer | string) => Promise<string>;
     };
   }
 }

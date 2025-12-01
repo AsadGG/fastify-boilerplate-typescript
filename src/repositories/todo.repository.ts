@@ -27,8 +27,8 @@ export async function getTodos(
   kysely: Kysely<DB>,
   data: {
     page: number;
-    size: number;
     search?: string;
+    size: number;
   },
 ) {
   const [limit, offset] = getLimitAndOffset({
@@ -75,8 +75,8 @@ export async function getTodos(
   });
 
   return {
-    records,
     pagination,
+    records,
   };
 }
 

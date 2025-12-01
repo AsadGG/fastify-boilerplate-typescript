@@ -4,24 +4,24 @@ import HTTP_STATUS from '#utilities/http-status-codes';
 
 // #region GET
 const healthCheckSchema = {
-  description: `This route sends a response to the client with a status code of 200 and a message that the server is running.`,
-  tags: ['health check'],
-  summary: `This route checks the health of the server.`,
   operationId: `healthCheck`,
+  description: `This route sends a response to the client with a status code of 200 and a message that the server is running.`,
   response: {
     [HTTP_STATUS.OK]: EmptyResponseSchema(HTTP_STATUS.OK, 'server is running.'),
   },
+  summary: `This route checks the health of the server.`,
+  tags: ['health check'],
 };
 export function GET(_fastify: FastifyInstance) {
   return {
-    schema: healthCheckSchema,
     async handler(request: FastifyRequest, reply: FastifyReply) {
       request.log.info({ message: 'server is running.' });
       return reply.status(HTTP_STATUS.OK).send({
-        statusCode: HTTP_STATUS.OK,
         message: 'server is running.',
+        statusCode: HTTP_STATUS.OK,
       });
     },
+    schema: healthCheckSchema,
   };
 }
 // #endregion GET

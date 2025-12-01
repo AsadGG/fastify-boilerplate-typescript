@@ -14,8 +14,8 @@ export type Int8 = ColumnType<string, bigint | number | string, bigint | number 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export interface File {
-  filename: string;
   id: Generated<string>;
+  filename: string;
   mimetype: string;
   size: Int8;
   url: string;
@@ -28,21 +28,21 @@ export interface KeyValueStore {
 }
 
 export interface SuperAdmin {
-  email: string;
   id: Generated<string>;
   imageFileId: string | null;
+  email: string;
   name: string;
   password: string;
   phone: string;
 }
 
 export interface Todo {
-  completed: Generated<boolean>;
-  createdAt: Generated<Timestamp>;
-  deletedAt: Timestamp | null;
   id: Generated<string>;
+  completed: Generated<boolean>;
+  deletedAt: Timestamp | null;
   isActive: Generated<boolean>;
   task: string;
+  createdAt: Generated<Timestamp>;
   updatedAt: Generated<Timestamp>;
 }
 
