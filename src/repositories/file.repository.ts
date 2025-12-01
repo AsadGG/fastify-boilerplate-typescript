@@ -5,6 +5,7 @@ import { promiseHandler } from '#utilities/promise-handler';
 export async function createFile(
   kysely: Kysely<DB>,
   data: {
+    id: string;
     filename: string;
     mimetype: string;
     size: number;
@@ -14,6 +15,7 @@ export async function createFile(
   const query = kysely
     .insertInto('file')
     .values({
+      id: data.id,
       filename: data.filename,
       mimetype: data.mimetype,
       size: data.size,
