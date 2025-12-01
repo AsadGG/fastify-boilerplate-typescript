@@ -7,6 +7,7 @@ import { GLOBAL_CONSTANTS } from '#root/global-constants';
 import { ResponseSchema } from '#schemas/common.schema';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { promiseHandler } from '#utilities/promise-handler';
+import { randomUuidV7 } from '#utilities/random-uuid-v7';
 import { Type } from '@sinclair/typebox';
 
 function resolveUploadDirectory(mimetype: string): string {
@@ -77,7 +78,11 @@ export function POST(fastify: FastifyInstance) {
     ) {
       const { buffer, filename, mimetype, size } = request.body.file;
 
-      const randomName = `${crypto.randomUUID()}.${filename.split('.').pop()}`;
+      const newId = randomUuidV7();
+
+      const extension = path.extname(filename).toLowerCase();
+
+      const randomName = `${newId}${extension}`;
 
       const uploadSubDirectory = resolveUploadDirectory(mimetype);
 
@@ -93,6 +98,7 @@ export function POST(fastify: FastifyInstance) {
       const url = `${fastify.config.STATIC_SERVE_PREFIX}/${uploadSubDirectory}/${randomName}`;
 
       const data = {
+        id: newId,
         filename,
         mimetype,
         size,
