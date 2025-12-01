@@ -4,8 +4,8 @@ import isPlainObject from 'lodash/isPlainObject.js';
 import snakeCase from 'lodash/snakeCase.js';
 
 export function camelCaseKeys(
-  object: Record<string, any> | Array<Record<string, any>>,
-): Record<string, any> | Array<Record<string, any>> {
+  object: Array<Record<string, any>> | Record<string, any>,
+): Array<Record<string, any>> | Record<string, any> {
   if (isArray(object))
     return object.map(camelCaseKeys);
   if (!isPlainObject(object))
@@ -28,8 +28,8 @@ export function camelCaseKeys(
 }
 
 export function snakeCaseKeys(
-  object: Record<string, any> | Array<Record<string, any>>,
-): Record<string, any> | Array<Record<string, any>> {
+  object: Array<Record<string, any>> | Record<string, any>,
+): Array<Record<string, any>> | Record<string, any> {
   if (isArray(object))
     return object.map(snakeCaseKeys);
   if (!isPlainObject(object))

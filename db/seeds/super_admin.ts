@@ -9,8 +9,8 @@ export async function seed(db: Kysely<DB>) {
   await db
     .insertInto('superAdmin')
     .values({
-      name: 'Asad',
       email: 'asad@admin.com',
+      name: 'Asad',
       password,
       phone: '03001234567',
     })

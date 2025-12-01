@@ -17,27 +17,27 @@ import { Type } from '@sinclair/typebox';
 const AuthenticateUserSchema = Type.Object(
   {
     id: Type.String({
-      format: 'uuid',
       description: 'unique identifier of the user',
+      format: 'uuid',
     }),
+    email: Type.String({ description: 'email address', format: 'email' }),
+    image: Type.Union([
+      Type.Object({
+        filename: Type.String({ examples: ['profile-picture.png'] }),
+        mimetype: Type.String({ examples: ['image/png'] }),
+        size: Type.Number({ examples: [8192] }),
+        url: Type.String({ format: 'uri' }),
+      }),
+      Type.Null(),
+    ]),
     name: Type.String({
       description: 'full name of the user',
       examples: ['John doe'],
     }),
-    email: Type.String({ format: 'email', description: 'email address' }),
     phone: Type.String({
       description: 'phone number',
       examples: ['03001234567'],
     }),
-    image: Type.Union([
-      Type.Object({
-        filename: Type.String({ examples: ['profile-picture.png'] }),
-        url: Type.String({ format: 'uri' }),
-        mimetype: Type.String({ examples: ['image/png'] }),
-        size: Type.Number({ examples: [8192] }),
-      }),
-      Type.Null(),
-    ]),
     accessToken: Type.String({
       description: 'access token used for authentication',
       examples: [
@@ -61,11 +61,9 @@ const PostSchemaBody = Type.Object(
   { additionalProperties: false },
 );
 const superAdminSignInSchema = {
-  description: 'this will sign in super admin',
-  tags: ['v1|super admin'],
-  summary: 'sign in super admin',
   operationId: 'superAdminSignIn',
   body: PostSchemaBody,
+  description: 'this will sign in super admin',
   response: {
     [HTTP_STATUS.OK]: ResponseSchema(
       AuthenticateUserSchema,
@@ -77,10 +75,11 @@ const superAdminSignInSchema = {
       'invalid credentials.',
     ),
   },
+  summary: 'sign in super admin',
+  tags: ['v1|super admin'],
 };
 export function POST(fastify: FastifyInstance) {
   return {
-    schema: superAdminSignInSchema,
     async handler(
       request: FastifyRequest<{
         Body: Static<typeof PostSchemaBody>;
@@ -98,15 +97,15 @@ export function POST(fastify: FastifyInstance) {
             ? HTTP_STATUS.UNAUTHORIZED
             : HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          statusCode,
           message:
             error.statusCode === HTTP_STATUS.NOT_FOUND
               ? `invalid credentials.`
               : `something went wrong.`,
+          statusCode,
         };
         request.log.error({
-          payload: data,
           error,
+          payload: data,
         });
         return reply.status(statusCode).send(errorObject);
       }
@@ -118,12 +117,12 @@ export function POST(fastify: FastifyInstance) {
 
       if (!isPasswordMatch) {
         const errorObject = {
-          statusCode: HTTP_STATUS.UNAUTHORIZED,
           message: `invalid credentials.`,
+          statusCode: HTTP_STATUS.UNAUTHORIZED,
         };
         request.log.error({
-          payload: data,
           error,
+          payload: data,
         });
         return reply.status(HTTP_STATUS.UNAUTHORIZED).send(errorObject);
       }
@@ -165,16 +164,17 @@ export function POST(fastify: FastifyInstance) {
       }
 
       return reply.status(HTTP_STATUS.OK).send({
-        statusCode: HTTP_STATUS.OK,
-        message: 'signed in successfully.',
         data: {
           ...result,
           password: undefined,
           accessToken: `${superAdminId}:${accessTokenHash}`,
           refreshToken: `${superAdminId}:${refreshTokenHash}`,
         },
+        message: 'signed in successfully.',
+        statusCode: HTTP_STATUS.OK,
       });
     },
+    schema: superAdminSignInSchema,
   };
 }
 // #endregion POST

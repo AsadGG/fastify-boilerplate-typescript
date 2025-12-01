@@ -10,9 +10,9 @@ export function fileJsonExpression(eb: ExpressionBuilder<DB, 'file'>) {
       jsonBuildObject({
         id: eb.ref('file.id').$notNull(),
         filename: eb.ref('file.filename').$notNull(),
-        url: eb.ref('file.url').$notNull(),
         mimetype: eb.ref('file.mimetype').$notNull(),
         size: eb.ref('file.size').$notNull(),
+        url: eb.ref('file.url').$notNull(),
       }),
     )
     .else(eb.val(null))

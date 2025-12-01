@@ -26,7 +26,6 @@ const loggerTypes = [
 ];
 
 const loggerType = await select({
-  message: 'Select A Logger Type',
   choices: [
     { name: 'all', value: '' },
     ...loggerTypes.map(loggerType => ({
@@ -34,6 +33,7 @@ const loggerType = await select({
       value: loggerType,
     })),
   ],
+  message: 'Select A Logger Type',
 }).catch((e) => {
   console.error(`\n${chalk.red(`Error: ${e.message}`)}\n`);
   process.exit(0);
@@ -55,11 +55,11 @@ const logFilesObjectPromise = logFiles
 const logFilesObject = await Promise.all(logFilesObjectPromise);
 
 const filePath = await select({
-  message: 'Select A Log File',
   choices: logFilesObject.map(logFile => ({
     name: logFile.name,
     value: logFile.path,
   })),
+  message: 'Select A Log File',
 }).catch((e) => {
   console.error(`\n${chalk.red(`Error: ${e.message}`)}\n`);
   process.exit(0);
@@ -70,9 +70,9 @@ const readableStream = fs.createReadStream(filePath, {
 });
 
 const prettyStream = pretty({
+  append: false,
   colorize: false,
   destination: `${filePath}.readable`,
-  append: false,
 });
 
 for await (const line of readableStream) {

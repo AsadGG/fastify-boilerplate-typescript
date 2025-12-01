@@ -9,11 +9,8 @@ import { getSuperAdminKeysPattern } from '#utilities/redis-keys';
 
 // #region POST
 const superAdminSignOutSchema = {
-  description: 'this will sign out super admin',
-  tags: ['v1|super admin'],
-  summary: 'sign out super admin',
-  security: [{ AuthorizationSuperAdminAccess: [] }],
   operationId: 'superAdminSignOut',
+  description: 'this will sign out super admin',
   response: {
     [HTTP_STATUS.OK]: EmptyResponseSchema(
       HTTP_STATUS.OK,
@@ -26,18 +23,19 @@ const superAdminSignOutSchema = {
       'Authorization token expired',
     ),
   },
+  security: [{ AuthorizationSuperAdminAccess: [] }],
+  summary: 'sign out super admin',
+  tags: ['v1|super admin'],
 };
 export function POST(fastify: FastifyInstance) {
   return {
-    schema: superAdminSignOutSchema,
-    onRequest: [fastify.authenticateSuperAdminAccess],
     async handler(
       request: FastifyRequest & { user: { superAdminId: string } },
       reply: FastifyReply,
     ) {
       const { superAdminId } = request.user;
 
-      const { keys, del } = createRedisFunctions(fastify.redis);
+      const { del, keys } = createRedisFunctions(fastify.redis);
 
       const pattern = getSuperAdminKeysPattern(superAdminId);
 
@@ -46,10 +44,12 @@ export function POST(fastify: FastifyInstance) {
       await del(superAdminKeys);
 
       return reply.status(HTTP_STATUS.OK).send({
-        statusCode: HTTP_STATUS.OK,
         message: 'signed out successfully.',
+        statusCode: HTTP_STATUS.OK,
       });
     },
+    onRequest: [fastify.authenticateSuperAdminAccess],
+    schema: superAdminSignOutSchema,
   };
 }
 // #endregion POST

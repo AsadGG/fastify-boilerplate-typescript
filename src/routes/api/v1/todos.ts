@@ -18,25 +18,24 @@ const GetSchemaQuerystring = Type.Composite(
   { additionalProperties: false },
 );
 const fetchTodosSchema = {
-  description: 'this will fetch todos',
-  tags: ['v1|todos'],
-  summary: 'fetch todos',
   operationId: 'getTodos',
+  description: 'this will fetch todos',
   querystring: GetSchemaQuerystring,
   response: {
     [HTTP_STATUS.OK]: PaginatedResponseSchema(
       Type.Object({
         id: Type.String({ format: 'uuid' }),
-        task: Type.String(),
         completed: Type.Boolean(),
+        task: Type.String(),
       }),
       HTTP_STATUS.OK,
     ),
   },
+  summary: 'fetch todos',
+  tags: ['v1|todos'],
 };
 export function GET(fastify: FastifyInstance) {
   return {
-    schema: fetchTodosSchema,
     async handler(
       request: FastifyRequest<{
         Querystring: Static<typeof GetSchemaQuerystring>;
@@ -45,8 +44,8 @@ export function GET(fastify: FastifyInstance) {
     ) {
       const data = {
         page: request.query.page,
-        size: request.query.size,
         search: request.query.search,
+        size: request.query.size,
       };
 
       const promise = getTodos(fastify.kysely, data);
@@ -56,22 +55,23 @@ export function GET(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          statusCode,
           message: error.message,
+          statusCode,
         };
         request.log.error({
-          payload: data,
           error,
+          payload: data,
         });
         return reply.status(statusCode).send(errorObject);
       }
       return reply.status(HTTP_STATUS.OK).send({
-        statusCode: HTTP_STATUS.OK,
-        message: 'todos fetched successfully.',
         data: result.records,
+        message: 'todos fetched successfully.',
         pagination: result.pagination,
+        statusCode: HTTP_STATUS.OK,
       });
     },
+    schema: fetchTodosSchema,
   };
 }
 // #endregion GET
@@ -84,30 +84,29 @@ const PostSchemaBody = Type.Object(
   { additionalProperties: false },
 );
 const createTodosSchema = {
-  description: 'this will create todo',
-  tags: ['v1|todos'],
-  summary: 'create todo',
   operationId: 'createTodo',
   body: PostSchemaBody,
+  description: 'this will create todo',
   response: {
-    [HTTP_STATUS.CREATED]: ResponseSchema(
-      Type.Object({
-        id: Type.String({ format: 'uuid' }),
-        task: Type.String(),
-        completed: Type.Boolean(),
-      }),
-      HTTP_STATUS.CREATED,
-      'record created successfully.',
-    ),
     [HTTP_STATUS.CONFLICT]: EmptyResponseSchema(
       HTTP_STATUS.CONFLICT,
       'record already exists',
     ),
+    [HTTP_STATUS.CREATED]: ResponseSchema(
+      Type.Object({
+        id: Type.String({ format: 'uuid' }),
+        completed: Type.Boolean(),
+        task: Type.String(),
+      }),
+      HTTP_STATUS.CREATED,
+      'record created successfully.',
+    ),
   },
+  summary: 'create todo',
+  tags: ['v1|todos'],
 };
 export function POST(fastify: FastifyInstance) {
   return {
-    schema: createTodosSchema,
     async handler(
       request: FastifyRequest<{
         Body: Static<typeof PostSchemaBody>;
@@ -125,21 +124,22 @@ export function POST(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          statusCode,
           message: error.message,
+          statusCode,
         };
         request.log.error({
-          payload: data,
           error,
+          payload: data,
         });
         return reply.status(statusCode).send(errorObject);
       }
       return reply.status(HTTP_STATUS.CREATED).send({
-        statusCode: HTTP_STATUS.CREATED,
-        message: 'todo created successfully.',
         data: result.record,
+        message: 'todo created successfully.',
+        statusCode: HTTP_STATUS.CREATED,
       });
     },
+    schema: createTodosSchema,
   };
 }
 // #endregion POST

@@ -33,11 +33,11 @@ export function getPaginationObject({ page = 1, size = 10, total = 0 }) {
 
   const lastPage = Math.ceil(total / size);
   return {
-    total,
+    currentPage: page,
     lastPage,
-    prevPage: page > 1 ? page - 1 : null,
     nextPage: page < lastPage ? page + 1 : null,
     perPage: size,
-    currentPage: page,
+    prevPage: page > 1 ? page - 1 : null,
+    total,
   };
 }

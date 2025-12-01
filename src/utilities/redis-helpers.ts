@@ -32,9 +32,9 @@ export function createRedisFunctions(redis: FastifyRedis) {
   }
 
   return {
-    get,
-    set,
-    keys,
     del,
+    get,
+    keys,
+    set,
   };
 }

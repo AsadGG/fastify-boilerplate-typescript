@@ -15,54 +15,54 @@ export function createLogger(moduleName: string) {
       [key: string]: pino.SerializerFn;
     }
     | undefined = {
-      request(request) {
-        return {
-          method: request.method,
-          url: request.url,
-          path: request.path,
-          parameters: request.parameters,
-          headers: request.headers,
-        };
-      },
       reply(reply) {
         return {
           statusCode: reply.statusCode,
         };
       },
+      request(request) {
+        return {
+          headers: request.headers,
+          method: request.method,
+          parameters: request.parameters,
+          path: request.path,
+          url: request.url,
+        };
+      },
     };
 
   const redact = {
-    paths: ['request.headers.authorization', '*.password'],
     censor: '*** REDACTED ***',
+    paths: ['request.headers.authorization', '*.password'],
   };
 
   const targets = [
     {
       level: 'info',
-      target: 'pino-roll',
       options: {
+        dateFormat: 'yyyy-MM-dd',
+        extension: '.log',
         file: logFilePath,
         frequency: 'daily',
         mkdir: true,
-        extension: '.log',
         size: '8m',
-        dateFormat: 'yyyy-MM-dd',
       },
+      target: 'pino-roll',
     },
     {
       level: 'info',
-      target: 'pino-pretty',
       options: {
         colorize: true,
         destination: 1,
       },
+      target: 'pino-pretty',
     },
   ];
 
   const pinoOptions: LoggerOptions = {
-    name: upperFirst(camelCase(moduleName)),
-    messageKey: 'message',
     errorKey: 'error',
+    messageKey: 'message',
+    name: upperFirst(camelCase(moduleName)),
     redact,
     serializers,
     transport: {
