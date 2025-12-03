@@ -44,8 +44,8 @@ export function POST(fastify: FastifyInstance) {
       await del(superAdminKeys);
 
       return reply.status(HTTP_STATUS.OK).send({
-        message: 'signed out successfully.',
         statusCode: HTTP_STATUS.OK,
+        message: 'signed out successfully.',
       });
     },
     onRequest: [fastify.authenticateSuperAdminAccess],

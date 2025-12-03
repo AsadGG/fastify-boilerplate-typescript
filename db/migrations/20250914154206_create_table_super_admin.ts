@@ -1,8 +1,8 @@
 import type { Kysely } from 'kysely';
 import { sql } from 'kysely';
 
-export async function up(db: Kysely<any>): Promise<void> {
-  await db.schema
+export async function up(database: Kysely<any>): Promise<void> {
+  await database.schema
     .createTable('super_admin')
     .addColumn('id', 'uuid', col => col.primaryKey().defaultTo(sql`uuidv7()`))
     .addColumn('name', 'text', col => col.notNull())
@@ -15,13 +15,13 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addUniqueConstraint('phone_unique', ['phone'])
     .execute();
 
-  await db.schema
+  await database.schema
     .createIndex('super_admin_image_file_id_index')
     .on('super_admin')
     .column('image_file_id')
     .execute();
 }
 
-export async function down(db: Kysely<any>): Promise<void> {
-  await db.schema.dropTable('super_admin').execute();
+export async function down(database: Kysely<any>): Promise<void> {
+  await database.schema.dropTable('super_admin').execute();
 }

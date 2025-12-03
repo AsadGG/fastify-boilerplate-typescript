@@ -28,7 +28,7 @@ export const UserSchema = Type.Object(
   { additionalProperties: false },
 );
 
-export const AuthenticateUserSchema = Type.Intersect([
+export const AuthenticateUserSchema = Type.Composite([
   UserSchema,
   Type.Object({
     accessToken: Type.String({
@@ -44,4 +44,4 @@ export const AuthenticateUserSchema = Type.Intersect([
       ],
     }),
   }),
-]);
+], { additionalProperties: false });

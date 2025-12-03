@@ -7,17 +7,17 @@ import pg from 'pg';
 
 const { Pool } = pg;
 
-async function fastifyKysely(fastify: FastifyInstance, opts: PoolConfig) {
+async function fastifyKysely(fastify: FastifyInstance, options: PoolConfig) {
   const dialect = new PostgresDialect({
-    pool: new Pool(opts),
+    pool: new Pool(options),
   });
-  const db = new Kysely<DB>({
+  const database = new Kysely<DB>({
     dialect,
     plugins: [new CamelCasePlugin()],
   });
-  fastify.decorate('kysely', db).addHook('onClose', async (instance) => {
+  fastify.decorate('kysely', database).addHook('onClose', async (instance) => {
     /* istanbul ignore else */
-    if (instance.kysely === db) {
+    if (instance.kysely === database) {
       instance.kysely.destroy();
     }
   });

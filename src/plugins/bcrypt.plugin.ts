@@ -3,12 +3,12 @@ import type { Buffer } from 'node:buffer';
 import bcrypt from 'bcrypt';
 import fastifyPlugin from 'fastify-plugin';
 
-export interface bcryptPluginOpts {
+export interface bcryptPluginOptions {
   saltRounds: number;
 }
 
-async function fastifyBcrypt(fastify: FastifyInstance, opts: bcryptPluginOpts) {
-  const saltRounds = opts.saltRounds || 10;
+async function fastifyBcrypt(fastify: FastifyInstance, options: bcryptPluginOptions) {
+  const saltRounds = options.saltRounds || 10;
   const salt = bcrypt.genSaltSync(saltRounds);
   fastify.decorate('bcrypt', {
     compare(data, hash) {

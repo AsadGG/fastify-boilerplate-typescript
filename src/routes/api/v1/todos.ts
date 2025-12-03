@@ -55,8 +55,8 @@ export function GET(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          message: error.message,
           statusCode,
+          message: error.message,
         };
         request.log.error({
           error,
@@ -65,10 +65,10 @@ export function GET(fastify: FastifyInstance) {
         return reply.status(statusCode).send(errorObject);
       }
       return reply.status(HTTP_STATUS.OK).send({
-        data: result.records,
-        message: 'todos fetched successfully.',
-        pagination: result.pagination,
         statusCode: HTTP_STATUS.OK,
+        message: 'todos fetched successfully.',
+        data: result.records,
+        pagination: result.pagination,
       });
     },
     schema: fetchTodosSchema,
@@ -124,8 +124,8 @@ export function POST(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          message: error.message,
           statusCode,
+          message: error.message,
         };
         request.log.error({
           error,
@@ -134,9 +134,9 @@ export function POST(fastify: FastifyInstance) {
         return reply.status(statusCode).send(errorObject);
       }
       return reply.status(HTTP_STATUS.CREATED).send({
-        data: result.record,
-        message: 'todo created successfully.',
         statusCode: HTTP_STATUS.CREATED,
+        message: 'todo created successfully.',
+        data: result.record,
       });
     },
     schema: createTodosSchema,

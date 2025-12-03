@@ -7,7 +7,7 @@ import { promiseHandler } from '#utilities/promise-handler';
 import { Type } from '@sinclair/typebox';
 
 // #region PATCH
-const PatchSchemaParams = Type.Object(
+const PatchSchemaParameters = Type.Object(
   {
     todoId: Type.String({ format: 'uuid' }),
   },
@@ -16,7 +16,7 @@ const PatchSchemaParams = Type.Object(
 const completeTodoSchema = {
   operationId: 'completeTodo',
   description: 'this will mark todo as complete',
-  params: PatchSchemaParams,
+  params: PatchSchemaParameters,
   response: {
     [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
       HTTP_STATUS.NOT_FOUND,
@@ -39,7 +39,7 @@ export function PATCH(fastify: FastifyInstance) {
   return {
     async handler(
       request: FastifyRequest<{
-        Params: Static<typeof PatchSchemaParams>;
+        Params: Static<typeof PatchSchemaParameters>;
       }>,
       reply: FastifyReply,
     ) {
@@ -55,8 +55,8 @@ export function PATCH(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          message: error.message,
           statusCode,
+          message: error.message,
         };
         request.log.error({
           error,
@@ -65,9 +65,9 @@ export function PATCH(fastify: FastifyInstance) {
         return reply.status(statusCode).send(errorObject);
       }
       return reply.status(HTTP_STATUS.OK).send({
-        data: result.record,
-        message: 'todo marked as complete successfully.',
         statusCode: HTTP_STATUS.OK,
+        message: 'todo marked as complete successfully.',
+        data: result.record,
       });
     },
     schema: completeTodoSchema,

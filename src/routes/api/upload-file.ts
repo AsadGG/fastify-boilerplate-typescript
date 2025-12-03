@@ -22,21 +22,27 @@ function resolveUploadDirectory(mimetype: string): string {
     return 'audios';
 
   switch (mimetype) {
-    case 'application/pdf':
+    case 'application/pdf': {
       return 'documents';
+    }
     case 'application/msword':
-    case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+    case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': {
       return 'documents';
+    }
     case 'application/vnd.ms-excel':
-    case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+    case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': {
       return 'spreadsheets';
+    }
     case 'application/vnd.ms-powerpoint':
-    case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+    case 'application/vnd.openxmlformats-officedocument.presentationml.presentation': {
       return 'presentations';
-    case 'text/plain':
+    }
+    case 'text/plain': {
       return 'texts';
-    default:
+    }
+    default: {
       return 'others';
+    }
   }
 }
 
@@ -112,8 +118,8 @@ export function POST(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          message: error.message,
           statusCode,
+          message: error.message,
         };
         request.log.error({
           error,
@@ -123,12 +129,12 @@ export function POST(fastify: FastifyInstance) {
       }
 
       return reply.status(HTTP_STATUS.CREATED).send({
+        statusCode: HTTP_STATUS.CREATED,
+        message: 'file uploaded successfully.',
         data: {
           ...result.record,
           url: `${fastify.config.WEB_SERVER_BASE_URL}${url}`,
         },
-        message: 'file uploaded successfully.',
-        statusCode: HTTP_STATUS.CREATED,
       });
     },
     schema: uploadFileSchema,

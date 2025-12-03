@@ -49,8 +49,8 @@ export function POST(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          message: error.message,
           statusCode,
+          message: error.message,
         };
         request.log.error({
           error,
@@ -95,14 +95,14 @@ export function POST(fastify: FastifyInstance) {
       }
 
       return reply.status(HTTP_STATUS.OK).send({
+        statusCode: HTTP_STATUS.OK,
+        message: 'token refreshed successfully.',
         data: {
           ...result,
           password: undefined,
           accessToken: `${superAdminId}:${accessTokenHash}`,
           refreshToken: `${superAdminId}:${refreshTokenHash}`,
         },
-        message: 'token refreshed successfully.',
-        statusCode: HTTP_STATUS.OK,
       });
     },
     onRequest: [fastify.authenticateSuperAdminRefresh],

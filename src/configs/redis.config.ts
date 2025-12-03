@@ -1,4 +1,4 @@
-import type { ENVSchemaType } from '#configs/env.config';
+import type { ENVSchemaType } from '#configs/environment.config';
 import type { FastifyRedisPluginOptions } from '@fastify/redis';
 
 export function redisConfig(config: ENVSchemaType): FastifyRedisPluginOptions {

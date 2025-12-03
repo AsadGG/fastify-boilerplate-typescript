@@ -1,6 +1,6 @@
-import type { bcryptPluginOpts } from '#plugins/bcrypt.plugin';
+import type { bcryptPluginOptions } from '#plugins/bcrypt.plugin';
 
-export function bcryptConfig(): bcryptPluginOpts {
+export function bcryptConfig(): bcryptPluginOptions {
   return {
     saltRounds: 12,
   };

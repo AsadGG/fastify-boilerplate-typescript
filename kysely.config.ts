@@ -13,13 +13,13 @@ const dialect = new PostgresDialect({
   }),
 });
 
-const db = new Kysely<DB>({
+const database = new Kysely<DB>({
   dialect,
   plugins: [new CamelCasePlugin()],
 });
 
 export default defineConfig({
-  kysely: db,
+  kysely: database,
   migrations: {
     getMigrationPrefix: getKnexTimestampPrefix,
     migrationFolder: `./db/migrations`,

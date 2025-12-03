@@ -35,13 +35,13 @@ const AuthorizationTokenInvalidError = createError(
 const TOKEN_PATTERN
   = /^([0-9A-F]{8}-[0-9A-F]{4}-[1-7][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}):([A-F0-9]{64})$/i;
 
-async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
-  await fastify.register(fastifyJWT, opts.superAdminAccess);
-  await fastify.register(fastifyJWT, opts.superAdminRefresh);
-  await fastify.register(fastifyJWT, opts.tenantAdminAccess);
-  await fastify.register(fastifyJWT, opts.tenantAdminRefresh);
-  await fastify.register(fastifyJWT, opts.officeUserAccess);
-  await fastify.register(fastifyJWT, opts.officeUserRefresh);
+async function myFastifyJWT(fastify: FastifyInstance, options: CustomJWTOptions) {
+  await fastify.register(fastifyJWT, options.superAdminAccess);
+  await fastify.register(fastifyJWT, options.superAdminRefresh);
+  await fastify.register(fastifyJWT, options.tenantAdminAccess);
+  await fastify.register(fastifyJWT, options.tenantAdminRefresh);
+  await fastify.register(fastifyJWT, options.officeUserAccess);
+  await fastify.register(fastifyJWT, options.officeUserRefresh);
 
   const { del, get } = createRedisFunctions(fastify.redis);
 
@@ -67,8 +67,8 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         request.headers.authorization = `Bearer ${token}`;
         await request.superAdminAccessJwtVerify();
       }
-      catch (err) {
-        reply.send(err);
+      catch (error) {
+        reply.send(error);
       }
     },
   );
@@ -96,8 +96,8 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         request.headers.authorization = `Bearer ${token}`;
         await request.superAdminRefreshJwtVerify();
       }
-      catch (err) {
-        reply.send(err);
+      catch (error) {
+        reply.send(error);
       }
     },
   );
@@ -130,8 +130,8 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         request.headers.authorization = `Bearer ${token}`;
         await request.tenantAdminAccessJwtVerify();
       }
-      catch (err) {
-        reply.send(err);
+      catch (error) {
+        reply.send(error);
       }
     },
   );
@@ -165,8 +165,8 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         request.headers.authorization = `Bearer ${token}`;
         await request.tenantAdminRefreshJwtVerify();
       }
-      catch (err) {
-        reply.send(err);
+      catch (error) {
+        reply.send(error);
       }
     },
   );
@@ -199,8 +199,8 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         request.headers.authorization = `Bearer ${token}`;
         await request.officeUserAccessJwtVerify();
       }
-      catch (err) {
-        reply.send(err);
+      catch (error) {
+        reply.send(error);
       }
     },
   );
@@ -233,8 +233,8 @@ async function myFastifyJWT(fastify: FastifyInstance, opts: CustomJWTOptions) {
         request.headers.authorization = `Bearer ${token}`;
         await request.officeUserRefreshJwtVerify();
       }
-      catch (err) {
-        reply.send(err);
+      catch (error) {
+        reply.send(error);
       }
     },
   );

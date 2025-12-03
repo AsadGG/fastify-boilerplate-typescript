@@ -11,8 +11,8 @@ export default function getConflicts(errorMessage: string) {
     const keys = regExpExecArray[1].split(', ');
     const values = regExpExecArray[2].split(', ');
 
-    for (let index = 0; index < keys.length; index++) {
-      const key = camelCase(keys[index]);
+    for (const [index, key_] of keys.entries()) {
+      const key = camelCase(key_);
       const value = values[index];
 
       errorObject[key] = value;

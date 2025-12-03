@@ -1,7 +1,7 @@
 import type Ajv from 'ajv';
 import process from 'node:process';
 import { bcryptConfig } from '#configs/bcrypt.config';
-import envConfig from '#configs/env.config';
+import envConfig from '#configs/environment.config';
 import { fileRoutesConfig } from '#configs/file-routes.config';
 import { JWTConfig } from '#configs/jwt.config';
 import kyselyConfig from '#configs/kysely.config';
@@ -110,7 +110,7 @@ await server.listen({
 function gracefulShutdown() {
   server.close(() => {
     server.log.info({ message: `Server is shutting down` });
-    process.exit(0);
+    throw new Error('Server is shutting down');
   });
 }
 process.on('SIGTERM', gracefulShutdown);

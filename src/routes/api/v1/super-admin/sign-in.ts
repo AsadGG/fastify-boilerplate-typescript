@@ -59,11 +59,11 @@ export function POST(fastify: FastifyInstance) {
             ? HTTP_STATUS.UNAUTHORIZED
             : HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
+          statusCode,
           message:
             error.statusCode === HTTP_STATUS.NOT_FOUND
               ? `invalid credentials.`
               : `something went wrong.`,
-          statusCode,
         };
         request.log.error({
           error,
@@ -79,8 +79,8 @@ export function POST(fastify: FastifyInstance) {
 
       if (!isPasswordMatch) {
         const errorObject = {
-          message: `invalid credentials.`,
           statusCode: HTTP_STATUS.UNAUTHORIZED,
+          message: `invalid credentials.`,
         };
         request.log.error({
           error,
@@ -126,14 +126,14 @@ export function POST(fastify: FastifyInstance) {
       }
 
       return reply.status(HTTP_STATUS.OK).send({
+        statusCode: HTTP_STATUS.OK,
+        message: 'signed in successfully.',
         data: {
           ...result,
           password: undefined,
           accessToken: `${superAdminId}:${accessTokenHash}`,
           refreshToken: `${superAdminId}:${refreshTokenHash}`,
         },
-        message: 'signed in successfully.',
-        statusCode: HTTP_STATUS.OK,
       });
     },
     schema: superAdminSignInSchema,
