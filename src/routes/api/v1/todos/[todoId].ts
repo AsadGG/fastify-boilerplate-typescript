@@ -11,7 +11,7 @@ import { promiseHandler } from '#utilities/promise-handler';
 import { Type } from '@sinclair/typebox';
 
 // #region GET
-const GetSchemaParams = Type.Object(
+const GetSchemaParameters = Type.Object(
   {
     todoId: Type.String({ format: 'uuid' }),
   },
@@ -20,7 +20,7 @@ const GetSchemaParams = Type.Object(
 const fetchTodoSchema = {
   operationId: 'getTodo',
   description: 'this will fetch todo',
-  params: GetSchemaParams,
+  params: GetSchemaParameters,
   response: {
     [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
       HTTP_STATUS.NOT_FOUND,
@@ -42,7 +42,7 @@ export function GET(fastify: FastifyInstance) {
   return {
     async handler(
       request: FastifyRequest<{
-        Params: Static<typeof GetSchemaParams>;
+        Params: Static<typeof GetSchemaParameters>;
       }>,
       reply: FastifyReply,
     ) {
@@ -57,8 +57,8 @@ export function GET(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          message: error.message,
           statusCode,
+          message: error.message,
         };
         request.log.error({
           error,
@@ -67,9 +67,9 @@ export function GET(fastify: FastifyInstance) {
         return reply.status(statusCode).send(errorObject);
       }
       return reply.status(HTTP_STATUS.OK).send({
-        data: result.record,
-        message: 'todo fetched successfully.',
         statusCode: HTTP_STATUS.OK,
+        message: 'todo fetched successfully.',
+        data: result.record,
       });
     },
     schema: fetchTodoSchema,
@@ -78,7 +78,7 @@ export function GET(fastify: FastifyInstance) {
 // #endregion GET
 
 // #region PATCH
-const PatchSchemaParams = Type.Object(
+const PatchSchemaParameters = Type.Object(
   {
     todoId: Type.String({ format: 'uuid' }),
   },
@@ -94,7 +94,7 @@ const updateTodoSchema = {
   operationId: 'updateTodo',
   body: PatchSchemaBody,
   description: 'this will update todo',
-  params: PatchSchemaParams,
+  params: PatchSchemaParameters,
   response: {
     [HTTP_STATUS.CONFLICT]: EmptyResponseSchema(
       HTTP_STATUS.CONFLICT,
@@ -121,7 +121,7 @@ export function PATCH(fastify: FastifyInstance) {
     async handler(
       request: FastifyRequest<{
         Body: Static<typeof PatchSchemaBody>;
-        Params: Static<typeof GetSchemaParams>;
+        Params: Static<typeof GetSchemaParameters>;
       }>,
       reply: FastifyReply,
     ) {
@@ -137,8 +137,8 @@ export function PATCH(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          message: error.message,
           statusCode,
+          message: error.message,
         };
         request.log.error({
           error,
@@ -147,9 +147,9 @@ export function PATCH(fastify: FastifyInstance) {
         return reply.status(statusCode).send(errorObject);
       }
       return reply.status(HTTP_STATUS.OK).send({
-        data: result.record,
-        message: 'todo updated successfully.',
         statusCode: HTTP_STATUS.OK,
+        message: 'todo updated successfully.',
+        data: result.record,
       });
     },
     schema: updateTodoSchema,
@@ -158,7 +158,7 @@ export function PATCH(fastify: FastifyInstance) {
 // #endregion PATCH
 
 // #region DELETE
-const DeleteSchemaParams = Type.Object(
+const DeleteSchemaParameters = Type.Object(
   {
     todoId: Type.String({ format: 'uuid' }),
   },
@@ -168,7 +168,7 @@ const DeleteSchemaParams = Type.Object(
 const deleteTodoSchema = {
   operationId: 'deleteTodo',
   description: 'this will delete todo',
-  params: DeleteSchemaParams,
+  params: DeleteSchemaParameters,
   response: {
     [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
       HTTP_STATUS.NOT_FOUND,
@@ -189,7 +189,7 @@ export function DELETE(fastify: FastifyInstance) {
   return {
     async handler(
       request: FastifyRequest<{
-        Params: Static<typeof GetSchemaParams>;
+        Params: Static<typeof GetSchemaParameters>;
       }>,
       reply: FastifyReply,
     ) {
@@ -204,8 +204,8 @@ export function DELETE(fastify: FastifyInstance) {
         const statusCode
           = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
         const errorObject = {
-          message: error.message,
           statusCode,
+          message: error.message,
         };
         request.log.error({
           error,
@@ -214,9 +214,9 @@ export function DELETE(fastify: FastifyInstance) {
         return reply.status(statusCode).send(errorObject);
       }
       return reply.status(HTTP_STATUS.OK).send({
-        data: result.record,
-        message: 'todo deleted successfully.',
         statusCode: HTTP_STATUS.OK,
+        message: 'todo deleted successfully.',
+        data: result.record,
       });
     },
     schema: deleteTodoSchema,

@@ -11,16 +11,14 @@ export interface FastifyLoggerOptions {
 
 async function fastifyLogger(
   fastify: FastifyInstance,
-  opts: FastifyLoggerOptions,
+  options: FastifyLoggerOptions,
 ) {
   fastify.addHook('onRequest', async (request) => {
     const rawURL = request.raw.url;
-    for (const logger of opts.loggers) {
-      if (rawURL) {
-        if (rawURL.includes(logger.path)) {
-          request.log = logger.logger;
-          break;
-        }
+    for (const logger of options.loggers) {
+      if (rawURL && rawURL.includes(logger.path)) {
+        request.log = logger.logger;
+        break;
       }
     }
   });

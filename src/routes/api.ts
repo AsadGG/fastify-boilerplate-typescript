@@ -17,8 +17,8 @@ export function GET(_fastify: FastifyInstance) {
     async handler(request: FastifyRequest, reply: FastifyReply) {
       request.log.info({ message: 'server is running.' });
       return reply.status(HTTP_STATUS.OK).send({
-        message: 'server is running.',
         statusCode: HTTP_STATUS.OK,
+        message: 'server is running.',
       });
     },
     schema: healthCheckSchema,

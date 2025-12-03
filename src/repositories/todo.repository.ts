@@ -42,7 +42,7 @@ export async function getTodos(
     .$if(Boolean(data.search), (qb) => {
       if (!data.search || !data.search.trim())
         return qb;
-      const searchText = `%${data.search.replace(/[%_]/g, '\\$&')}%`;
+      const searchText = `%${data.search.replaceAll(/[%_]/g, String.raw`\$&`)}%`;
       return qb.where('task', 'ilike', searchText);
     });
 

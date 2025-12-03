@@ -27,14 +27,14 @@ const ENV_SCHEMA = Type.Object({
   WEB_SERVER_BIND_ADDRESS: Type.String(),
 
   WEB_SERVER_PORT: Type.Integer({
-    maximum: 65535,
+    maximum: 65_535,
     minimum: 1000,
   }),
 });
 
 export type ENVSchemaType = Static<typeof ENV_SCHEMA>;
 
-function envConfig(): FastifyEnvOptions {
+function environmentConfig(): FastifyEnvOptions {
   return {
     ajv: {
       customOptions: (ajv: Ajv) => ajv.addSchema({ coerceTypes: true }),
@@ -47,7 +47,7 @@ function envConfig(): FastifyEnvOptions {
   };
 }
 
-export default envConfig;
+export default environmentConfig;
 
 declare module 'fastify' {
   interface FastifyInstance {

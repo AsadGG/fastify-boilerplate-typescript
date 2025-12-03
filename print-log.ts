@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
 import fs from 'node:fs';
-import process from 'node:process';
 import { select } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { glob } from 'glob';
@@ -9,11 +7,10 @@ import prettyBytes from 'pretty-bytes';
 
 const logFiles = await glob('logs/*.log');
 
-if (!logFiles.length) {
-  console.info(
+if (logFiles.length === 0) {
+  throw new Error(
     `\n${chalk.blue(`Info:No Log Files Found In Logs Folder`)}\n`,
   );
-  process.exit(0);
 }
 
 const loggerTypes = [
@@ -26,6 +23,7 @@ const loggerTypes = [
 ];
 
 const loggerType = await select({
+  message: 'Select A Logger Type',
   choices: [
     { name: 'all', value: '' },
     ...loggerTypes.map(loggerType => ({
@@ -33,10 +31,8 @@ const loggerType = await select({
       value: loggerType,
     })),
   ],
-  message: 'Select A Logger Type',
-}).catch((e) => {
-  console.error(`\n${chalk.red(`Error: ${e.message}`)}\n`);
-  process.exit(0);
+}).catch((error) => {
+  throw new Error(`\n${chalk.red(`Error: ${error.message}`)}\n`);
 });
 
 const logFilesObjectPromise = logFiles
@@ -55,14 +51,13 @@ const logFilesObjectPromise = logFiles
 const logFilesObject = await Promise.all(logFilesObjectPromise);
 
 const filePath = await select({
+  message: 'Select A Log File',
   choices: logFilesObject.map(logFile => ({
     name: logFile.name,
     value: logFile.path,
   })),
-  message: 'Select A Log File',
-}).catch((e) => {
-  console.error(`\n${chalk.red(`Error: ${e.message}`)}\n`);
-  process.exit(0);
+}).catch((error) => {
+  throw new Error(`\n${chalk.red(`Error: ${error.message}`)}\n`);
 });
 
 const readableStream = fs.createReadStream(filePath, {

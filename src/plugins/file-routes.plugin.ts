@@ -18,10 +18,10 @@ type Module = Partial<
   Record<(typeof methods)[number], (fastify: FastifyInstance) => RouteOptions>
 >;
 
-const extensions = ['.ts', '.js'];
+const extensions = new Set(['.ts', '.js']);
 
 function isRoute(extension: string) {
-  return extensions.includes(extension);
+  return extensions.has(extension);
 }
 
 function isTest(name: string) {
@@ -83,9 +83,9 @@ async function collectRoutes(
           }
         }
       }
-      catch (err) {
+      catch (error) {
         server.log.error(
-          { err, file: currentPath },
+          { err: error, file: currentPath },
           'Failed to load route module',
         );
       }
@@ -99,15 +99,15 @@ interface FileRoutesOptions {
   pathPrefix?: string;
   routesFolder: string;
 }
-async function fileRoutes(server: FastifyInstance, opts: FileRoutesOptions) {
-  if (!opts?.routesFolder) {
+async function fileRoutes(server: FastifyInstance, options: FileRoutesOptions) {
+  if (!options?.routesFolder) {
     throw new Error(`fileRoutes: opts.routesFolder is required`);
   }
 
   const routes = await collectRoutes(
     server,
-    opts.routesFolder,
-    opts.pathPrefix ?? '',
+    options.routesFolder,
+    options.pathPrefix ?? '',
   );
 
   await Promise.all(

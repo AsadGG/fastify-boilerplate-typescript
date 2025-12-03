@@ -69,10 +69,10 @@ export function PaginatedResponseSchema<T extends TSchema>(
 ) {
   return Type.Object(
     {
-      data: Type.Array(schema),
-      message: Type.String({ examples: [message] }),
-      pagination: PaginationMetaSchema,
       statusCode: Type.Literal(statusCode),
+      message: Type.String({ examples: [message] }),
+      data: Type.Array(schema),
+      pagination: PaginationMetaSchema,
     },
     { additionalProperties: false },
   );
@@ -85,9 +85,9 @@ export function ResponseSchema<T extends TSchema>(
 ) {
   return Type.Object(
     {
-      data: schema,
-      message: Type.String({ examples: [message] }),
       statusCode: Type.Literal(statusCode),
+      message: Type.String({ examples: [message] }),
+      data: schema,
     },
     { additionalProperties: false },
   );
@@ -99,8 +99,8 @@ export function EmptyResponseSchema(
 ) {
   return Type.Object(
     {
-      message: Type.String({ examples: [message] }),
       statusCode: Type.Literal(statusCode),
+      message: Type.String({ examples: [message] }),
     },
     { additionalProperties: false },
   );
@@ -114,6 +114,13 @@ export function ErrorResponseSchema(
 ) {
   return Type.Object(
     {
+      statusCode: Type.Literal(statusCode, {
+        description: 'http status code of the error response',
+      }),
+      message: Type.String({
+        description: 'detailed human-readable error message',
+        examples: [message],
+      }),
       code: Type.String({
         description: 'application or framework-specific error code',
         examples: [code],
@@ -121,13 +128,6 @@ export function ErrorResponseSchema(
       error: Type.String({
         description: 'short error label or type',
         examples: [error],
-      }),
-      message: Type.String({
-        description: 'detailed human-readable error message',
-        examples: [message],
-      }),
-      statusCode: Type.Literal(statusCode, {
-        description: 'http status code of the error response',
       }),
     },
     { additionalProperties: false },

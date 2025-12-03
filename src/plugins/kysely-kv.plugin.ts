@@ -39,11 +39,11 @@ export interface FastifyKyselyKVStoreOptions {
 }
 async function fastifyKyselyKVStore(
   fastify: FastifyInstance,
-  opts: FastifyKyselyKVStoreOptions,
+  options: FastifyKyselyKVStoreOptions,
 ) {
-  const schema = opts.schema ?? 'public';
-  const table = opts.table;
-  const useUnloggedTable = opts.useUnloggedTable ?? false;
+  const schema = options.schema ?? 'public';
+  const table = options.table;
+  const useUnloggedTable = options.useUnloggedTable ?? false;
 
   if (!('kysely' in fastify)) {
     throw new Error(
@@ -52,9 +52,9 @@ async function fastifyKyselyKVStore(
     );
   }
 
-  const db = fastify.kysely as Kysely<any>;
+  const database = fastify.kysely as Kysely<any>;
 
-  const tableExists = await db
+  const tableExists = await database
     .selectFrom('information_schema.tables')
     .select('table_name')
     .where('table_schema', '=', schema)
@@ -62,7 +62,7 @@ async function fastifyKyselyKVStore(
     .executeTakeFirst();
 
   if (!tableExists) {
-    await getTableQuery(table, useUnloggedTable, schema).execute(db);
+    await getTableQuery(table, useUnloggedTable, schema).execute(database);
   }
 
   const kvStore = {
@@ -71,7 +71,7 @@ async function fastifyKyselyKVStore(
       if (keysArray.length === 0)
         return;
 
-      await db
+      await database
         .withSchema(schema)
         .deleteFrom(table)
         .where('key', 'in', keysArray)
@@ -79,7 +79,7 @@ async function fastifyKyselyKVStore(
     },
 
     async get<T = unknown>(key: string): Promise<T | null> {
-      const row = await db
+      const row = await database
         .withSchema(schema)
         .selectFrom(table)
         .select(['value', 'expiresAt'])
@@ -105,9 +105,9 @@ async function fastifyKyselyKVStore(
     },
 
     async keys(pattern: string): Promise<string[]> {
-      const sqlPattern = pattern.replace(/\*/g, '%');
+      const sqlPattern = pattern.replaceAll('*', '%');
 
-      const rows = await db
+      const rows = await database
         .withSchema(schema)
         .selectFrom(table)
         .select('key')
@@ -125,7 +125,7 @@ async function fastifyKyselyKVStore(
       const stringifiedJson = JSON.stringify(value);
       const expiresAt = ttlMs ? new Date(Date.now() + ttlMs) : null;
 
-      await db
+      await database
         .withSchema(schema)
         .insertInto(table)
         .values({ expiresAt, key, value: stringifiedJson })

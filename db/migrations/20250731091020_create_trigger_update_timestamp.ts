@@ -4,10 +4,10 @@ import {
   dropUpdateTimestampTriggerFunction,
 } from '../kysely.utilities';
 
-export async function up(db: Kysely<any>): Promise<void> {
-  await createUpdateTimestampTriggerFunction.execute(db);
+export async function up(database: Kysely<any>): Promise<void> {
+  await createUpdateTimestampTriggerFunction.execute(database);
 }
 
-export async function down(db: Kysely<any>): Promise<void> {
-  await dropUpdateTimestampTriggerFunction.execute(db);
+export async function down(database: Kysely<any>): Promise<void> {
+  await dropUpdateTimestampTriggerFunction.execute(database);
 }

@@ -4,8 +4,8 @@ function secureRandom(max: number) {
   return array[0] % (max + 1);
 }
 
-function stringSample(str: string) {
-  return str.charAt(secureRandom(str.length - 1));
+function stringSample(string_: string) {
+  return string_.charAt(secureRandom(string_.length - 1));
 }
 
 const NUMBERS = '0123456789';

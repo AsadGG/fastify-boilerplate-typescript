@@ -2,11 +2,11 @@ import type { DB } from '#src/types/database';
 import type { Kysely } from 'kysely';
 import bcrypt from 'bcrypt';
 
-export async function seed(db: Kysely<DB>) {
+export async function seed(database: Kysely<DB>) {
   const salt = bcrypt.genSaltSync(12);
   const password = await bcrypt.hash('12345678', salt);
 
-  await db
+  await database
     .insertInto('superAdmin')
     .values({
       email: 'asad@admin.com',
@@ -16,5 +16,5 @@ export async function seed(db: Kysely<DB>) {
     })
     .execute();
 
-  await db.destroy();
+  await database.destroy();
 }

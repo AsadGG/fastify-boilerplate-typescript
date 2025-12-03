@@ -2,8 +2,8 @@ import type { Kysely } from 'kysely';
 import { sql } from 'kysely';
 import { createUpdateTimestampTrigger } from '../kysely.utilities';
 
-export async function up(db: Kysely<any>): Promise<void> {
-  await db.schema
+export async function up(database: Kysely<any>): Promise<void> {
+  await database.schema
     .createTable('todo')
     .addColumn('id', 'uuid', col => col.primaryKey().defaultTo(sql`uuidv7()`))
     .addColumn('task', 'text', col => col.notNull())
@@ -16,7 +16,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('deleted_at', 'timestamptz', col => col.defaultTo(null))
     .execute();
 
-  await db.schema
+  await database.schema
     .createIndex('todo_task_unique_index')
     .on('todo')
     .column('task')
@@ -24,9 +24,9 @@ export async function up(db: Kysely<any>): Promise<void> {
     .where(sql.ref('deleted_at'), 'is', null)
     .execute();
 
-  await createUpdateTimestampTrigger('todo').execute(db);
+  await createUpdateTimestampTrigger('todo').execute(database);
 }
 
-export async function down(db: Kysely<any>): Promise<void> {
-  await db.schema.dropTable('todo').execute();
+export async function down(database: Kysely<any>): Promise<void> {
+  await database.schema.dropTable('todo').execute();
 }
