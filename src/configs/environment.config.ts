@@ -4,38 +4,38 @@ import type Ajv from 'ajv';
 import { Type } from '@sinclair/typebox';
 
 const ENV_SCHEMA = Type.Object({
-  CRON_SECRET: Type.String(),
+  // APP
+  WEB_SERVER_BASE_URL: Type.String(),
+  WEB_SERVER_BIND_ADDRESS: Type.String(),
+  WEB_SERVER_PORT: Type.Integer({
+    maximum: 65_535,
+    minimum: 1000,
+  }),
+
+  // DB Client postgres
   DATABASE_URL: Type.String(),
-  OFFICE_USER_ACCESS_JWT_EXPIRES_IN: Type.String(),
 
-  OFFICE_USER_ACCESS_JWT_SECRET: Type.String(),
+  // JWT
+  // User Access
+  USER_ACCESS_JWT_EXPIRES_IN: Type.String(),
+  USER_ACCESS_JWT_SECRET: Type.String(),
+  // User Refresh
+  USER_REFRESH_JWT_EXPIRES_IN: Type.String(),
+  USER_REFRESH_JWT_SECRET: Type.String(),
 
-  OFFICE_USER_REFRESH_JWT_EXPIRES_IN: Type.String(),
-  OFFICE_USER_REFRESH_JWT_SECRET: Type.String(),
+  // Redis Client
   REDIS_HOST: Type.String(),
   REDIS_PORT: Type.Integer({
     maximum: 65_535,
     minimum: 1000,
   }),
+
+  // Static Serve
   STATIC_SERVE_FOLDER: Type.String(),
   STATIC_SERVE_PREFIX: Type.String(),
-  SUPER_ADMIN_ACCESS_JWT_EXPIRES_IN: Type.String(),
-  SUPER_ADMIN_ACCESS_JWT_SECRET: Type.String(),
-  SUPER_ADMIN_REFRESH_JWT_EXPIRES_IN: Type.String(),
-  SUPER_ADMIN_REFRESH_JWT_SECRET: Type.String(),
-  TENANT_ADMIN_ACCESS_JWT_EXPIRES_IN: Type.String(),
-  TENANT_ADMIN_ACCESS_JWT_SECRET: Type.String(),
 
-  TENANT_ADMIN_REFRESH_JWT_EXPIRES_IN: Type.String(),
-  TENANT_ADMIN_REFRESH_JWT_SECRET: Type.String(),
-
-  WEB_SERVER_BASE_URL: Type.String(),
-  WEB_SERVER_BIND_ADDRESS: Type.String(),
-
-  WEB_SERVER_PORT: Type.Integer({
-    maximum: 65_535,
-    minimum: 1000,
-  }),
+  // Cron
+  CRON_SECRET: Type.String(),
 });
 
 export type ENVSchemaType = Static<typeof ENV_SCHEMA>;

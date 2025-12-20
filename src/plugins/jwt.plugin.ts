@@ -3,12 +3,8 @@ import type { FastifyInstance } from 'fastify';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { createRedisFunctions } from '#utilities/redis-helpers';
 import {
-  getOfficeUserAccessTokenKey,
-  getOfficeUserRefreshTokenKey,
-  getSuperAdminAccessTokenKey,
-  getSuperAdminRefreshTokenKey,
-  getTenantAdminAccessTokenKey,
-  getTenantAdminRefreshTokenKey,
+  getUserAccessTokenKey,
+  getUserRefreshTokenKey,
 } from '#utilities/redis-keys';
 import createError from '@fastify/error';
 import fastifyJWT from '@fastify/jwt';
@@ -35,277 +31,97 @@ const AuthorizationTokenInvalidError = createError(
 const TOKEN_PATTERN
   = /^([0-9A-F]{8}-[0-9A-F]{4}-[1-7][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}):([A-F0-9]{64})$/i;
 
-async function myFastifyJWT(fastify: FastifyInstance, options: CustomJWTOptions) {
-  await fastify.register(fastifyJWT, options.superAdminAccess);
-  await fastify.register(fastifyJWT, options.superAdminRefresh);
-  await fastify.register(fastifyJWT, options.tenantAdminAccess);
-  await fastify.register(fastifyJWT, options.tenantAdminRefresh);
-  await fastify.register(fastifyJWT, options.officeUserAccess);
-  await fastify.register(fastifyJWT, options.officeUserRefresh);
+async function myFastifyJWT(
+  fastify: FastifyInstance,
+  options: CustomJWTOptions,
+) {
+  await fastify.register(fastifyJWT, options.userAccess);
+  await fastify.register(fastifyJWT, options.userRefresh);
 
   const { del, get } = createRedisFunctions(fastify.redis);
 
-  fastify.decorate(
-    'authenticateSuperAdminAccess',
-    async (request, reply) => {
-      try {
-        if (!request.headers.authorization) {
-          throw new NoAuthorizationInHeaderError();
-        }
-        const regExpExecArray = TOKEN_PATTERN.exec(
-          request.headers.authorization.replace('Bearer ', ''),
-        );
-        if (!regExpExecArray) {
-          throw new AuthorizationTokenInvalidError();
-        }
-        const [, superAdminId, tokenHash] = regExpExecArray;
-        const key = getSuperAdminAccessTokenKey(superAdminId, tokenHash);
-        const token = await get(key);
-        if (!token) {
-          throw new AuthorizationTokenExpiredError();
-        }
-        request.headers.authorization = `Bearer ${token}`;
-        await request.superAdminAccessJwtVerify();
+  fastify.decorate('authenticateUserAccess', async (request, reply) => {
+    try {
+      if (!request.headers.authorization) {
+        throw new NoAuthorizationInHeaderError();
       }
-      catch (error) {
-        reply.send(error);
+      const regExpExecArray = TOKEN_PATTERN.exec(
+        request.headers.authorization.replace('Bearer ', ''),
+      );
+      if (!regExpExecArray) {
+        throw new AuthorizationTokenInvalidError();
       }
-    },
-  );
-  fastify.decorate(
-    'authenticateSuperAdminRefresh',
-    async (request, reply) => {
-      try {
-        if (!request.headers.authorization) {
-          throw new NoAuthorizationInHeaderError();
-        }
+      const [, userId, tokenHash] = regExpExecArray;
+      const key = getUserAccessTokenKey(userId, tokenHash);
+      const token = await get(key);
+      if (!token) {
+        throw new AuthorizationTokenExpiredError();
+      }
+      request.headers.authorization = `Bearer ${token}`;
+      await request.userAccessJwtVerify();
+    }
+    catch (error) {
+      reply.send(error);
+    }
+  });
+  fastify.decorate('authenticateUserRefresh', async (request, reply) => {
+    try {
+      if (!request.headers.authorization) {
+        throw new NoAuthorizationInHeaderError();
+      }
 
-        const regExpExecArray = TOKEN_PATTERN.exec(
-          request.headers.authorization.replace('Bearer ', ''),
-        );
-        if (!regExpExecArray) {
-          throw new AuthorizationTokenInvalidError();
-        }
-        const [, superAdminId, tokenHash] = regExpExecArray;
-        const key = getSuperAdminRefreshTokenKey(superAdminId, tokenHash);
-        const token = await get(key);
-        if (!token) {
-          throw new AuthorizationTokenExpiredError();
-        }
-        await del([key]);
-        request.headers.authorization = `Bearer ${token}`;
-        await request.superAdminRefreshJwtVerify();
+      const regExpExecArray = TOKEN_PATTERN.exec(
+        request.headers.authorization.replace('Bearer ', ''),
+      );
+      if (!regExpExecArray) {
+        throw new AuthorizationTokenInvalidError();
       }
-      catch (error) {
-        reply.send(error);
+      const [, userId, tokenHash] = regExpExecArray;
+      const key = getUserRefreshTokenKey(userId, tokenHash);
+      const token = await get(key);
+      if (!token) {
+        throw new AuthorizationTokenExpiredError();
       }
-    },
-  );
-
-  fastify.decorate(
-    'authenticateTenantAdminAccess',
-    async (request, reply) => {
-      try {
-        if (!request.headers.authorization) {
-          throw new NoAuthorizationInHeaderError();
-        }
-
-        const regExpExecArray = TOKEN_PATTERN.exec(
-          request.headers.authorization.replace('Bearer ', ''),
-        );
-        if (!regExpExecArray) {
-          throw new AuthorizationTokenInvalidError();
-        }
-        const tenantId = request.params.tenantId;
-        const [, tenantAdminId, tokenHash] = regExpExecArray;
-        const key = getTenantAdminAccessTokenKey(
-          tenantId,
-          tenantAdminId,
-          tokenHash,
-        );
-        const token = await get(key);
-        if (!token) {
-          throw new AuthorizationTokenExpiredError();
-        }
-        request.headers.authorization = `Bearer ${token}`;
-        await request.tenantAdminAccessJwtVerify();
-      }
-      catch (error) {
-        reply.send(error);
-      }
-    },
-  );
-  fastify.decorate(
-    'authenticateTenantAdminRefresh',
-    async (request, reply) => {
-      try {
-        if (!request.headers.authorization) {
-          throw new NoAuthorizationInHeaderError();
-        }
-
-        const regExpExecArray = TOKEN_PATTERN.exec(
-          request.headers.authorization.replace('Bearer ', ''),
-        );
-        if (!regExpExecArray) {
-          throw new AuthorizationTokenInvalidError();
-        }
-        const tenantId = request.params.tenantId;
-        const [, tenantAdminId, tokenHash] = regExpExecArray;
-        const key = getTenantAdminRefreshTokenKey(
-          tenantId,
-          tenantAdminId,
-          tokenHash,
-        );
-
-        const token = await get(key);
-        if (!token) {
-          throw new AuthorizationTokenExpiredError();
-        }
-        await del([key]);
-        request.headers.authorization = `Bearer ${token}`;
-        await request.tenantAdminRefreshJwtVerify();
-      }
-      catch (error) {
-        reply.send(error);
-      }
-    },
-  );
-
-  fastify.decorate(
-    'authenticateOfficeUserAccess',
-    async (request, reply) => {
-      try {
-        if (!request.headers.authorization) {
-          throw new NoAuthorizationInHeaderError();
-        }
-
-        const regExpExecArray = TOKEN_PATTERN.exec(
-          request.headers.authorization.replace('Bearer ', ''),
-        );
-        if (!regExpExecArray) {
-          throw new AuthorizationTokenInvalidError();
-        }
-        const tenantId = request.params.tenantId;
-        const [, officeUserId, tokenHash] = regExpExecArray;
-        const key = getOfficeUserAccessTokenKey(
-          tenantId,
-          officeUserId,
-          tokenHash,
-        );
-        const token = await get(key);
-        if (!token) {
-          throw new AuthorizationTokenExpiredError();
-        }
-        request.headers.authorization = `Bearer ${token}`;
-        await request.officeUserAccessJwtVerify();
-      }
-      catch (error) {
-        reply.send(error);
-      }
-    },
-  );
-  fastify.decorate(
-    'authenticateOfficeUserRefresh',
-    async (request, reply) => {
-      try {
-        if (!request.headers.authorization) {
-          throw new NoAuthorizationInHeaderError();
-        }
-
-        const regExpExecArray = TOKEN_PATTERN.exec(
-          request.headers.authorization.replace('Bearer ', ''),
-        );
-        if (!regExpExecArray) {
-          throw new AuthorizationTokenInvalidError();
-        }
-        const tenantId = request.params.tenantId;
-        const [, officeUserId, tokenHash] = regExpExecArray;
-        const key = getOfficeUserRefreshTokenKey(
-          tenantId,
-          officeUserId,
-          tokenHash,
-        );
-        const token = await get(key);
-        if (!token) {
-          throw new AuthorizationTokenExpiredError();
-        }
-        await del([key]);
-        request.headers.authorization = `Bearer ${token}`;
-        await request.officeUserRefreshJwtVerify();
-      }
-      catch (error) {
-        reply.send(error);
-      }
-    },
-  );
+      await del([key]);
+      request.headers.authorization = `Bearer ${token}`;
+      await request.userRefreshJwtVerify();
+    }
+    catch (error) {
+      reply.send(error);
+    }
+  });
 }
 
 export default fastifyPlugin(myFastifyJWT);
 
 declare module 'fastify' {
   interface FastifyInstance {
-    authenticateOfficeUserAccess: (
-      request: FastifyRequest<{
-        Params: { tenantId: string };
-      }>,
-      reply: FastifyReply,
-    ) => void;
-    authenticateOfficeUserRefresh: (
-      request: FastifyRequest<{
-        Params: { tenantId: string };
-      }>,
-      reply: FastifyReply,
-    ) => void;
-    authenticateSuperAdminAccess: (
+    authenticateUserAccess: (
       request: FastifyRequest,
       reply: FastifyReply,
     ) => void;
-    authenticateSuperAdminRefresh: (
+    authenticateUserRefresh: (
       request: FastifyRequest,
-      reply: FastifyReply,
-    ) => void;
-    authenticateTenantAdminAccess: (
-      request: FastifyRequest<{
-        Params: { tenantId: string };
-      }>,
-      reply: FastifyReply,
-    ) => void;
-    authenticateTenantAdminRefresh: (
-      request: FastifyRequest<{
-        Params: { tenantId: string };
-      }>,
       reply: FastifyReply,
     ) => void;
   }
 
   interface FastifyRequest {
-    officeUserAccessJwtVerify: () => Promise<void>;
-    officeUserRefreshJwtVerify: () => Promise<void>;
-    superAdminAccess: () => Promise<void>;
-    superAdminAccessJwtVerify: () => Promise<void>;
-    superAdminRefreshJwtVerify: () => Promise<void>;
-    tenantAdminAccessJwtVerify: () => Promise<void>;
-    tenantAdminRefreshJwtVerify: () => Promise<void>;
+    userAccess: () => Promise<void>;
+    userAccessJwtVerify: () => Promise<void>;
+    userRefreshJwtVerify: () => Promise<void>;
   }
 }
 
 declare module '@fastify/jwt' {
   type JWTNamespaces
-    = | 'officeUserAccess'
-      | 'officeUserRefresh'
-      | 'superAdminAccess'
-      | 'superAdminRefresh'
-      | 'tenantAdminAccess'
-      | 'tenantAdminRefresh';
+    = | 'userAccess'
+      | 'userRefresh';
 
   type OmitNamespacesJWT = Omit<JWT, JWTNamespaces>;
 
   interface JWT {
-    officeUserAccess: OmitNamespacesJWT;
-    officeUserRefresh: OmitNamespacesJWT;
-    superAdminAccess: OmitNamespacesJWT;
-    superAdminRefresh: OmitNamespacesJWT;
-    tenantAdminAccess: OmitNamespacesJWT;
-    tenantAdminRefresh: OmitNamespacesJWT;
+    userAccess: OmitNamespacesJWT;
+    userRefresh: OmitNamespacesJWT;
   }
 }

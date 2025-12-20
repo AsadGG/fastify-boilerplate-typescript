@@ -1,6 +1,6 @@
 import type { Static } from '@sinclair/typebox';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { getSuperAdminByEmail } from '#repositories/super_admin.repository';
+import { getUserByEmail } from '#repositories/user.repository';
 import { EmptyResponseSchema, ResponseSchema } from '#schemas/common.schema';
 import { AuthenticateUserSchema } from '#schemas/user.schema';
 import { getSha256Hash } from '#utilities/hash';
@@ -8,8 +8,8 @@ import HTTP_STATUS from '#utilities/http-status-codes';
 import { promiseHandler } from '#utilities/promise-handler';
 import { createRedisFunctions } from '#utilities/redis-helpers';
 import {
-  getSuperAdminAccessTokenKey,
-  getSuperAdminRefreshTokenKey,
+  getUserAccessTokenKey,
+  getUserRefreshTokenKey,
 } from '#utilities/redis-keys';
 import { parse } from '@lukeed/ms';
 import { Type } from '@sinclair/typebox';
@@ -22,10 +22,10 @@ const PostSchemaBody = Type.Object(
   },
   { additionalProperties: false },
 );
-const superAdminSignInSchema = {
-  operationId: 'superAdminSignIn',
+const userSignInSchema = {
+  operationId: 'userSignIn',
   body: PostSchemaBody,
-  description: 'this will sign in super admin',
+  description: 'this will sign in user',
   response: {
     [HTTP_STATUS.OK]: ResponseSchema(
       AuthenticateUserSchema,
@@ -37,8 +37,8 @@ const superAdminSignInSchema = {
       'invalid credentials.',
     ),
   },
-  summary: 'sign in super admin',
-  tags: ['v1|super admin'],
+  summary: 'sign in user',
+  tags: ['v1|user'],
 };
 export function POST(fastify: FastifyInstance) {
   return {
@@ -51,7 +51,7 @@ export function POST(fastify: FastifyInstance) {
       const data = {
         ...request.body,
       };
-      const promise = getSuperAdminByEmail(fastify.kysely, data);
+      const promise = getUserByEmail(fastify.kysely, data);
       const [error, result, ok] = await promiseHandler(promise);
       if (!ok) {
         const statusCode
@@ -89,14 +89,14 @@ export function POST(fastify: FastifyInstance) {
         return reply.status(HTTP_STATUS.UNAUTHORIZED).send(errorObject);
       }
 
-      const superAdminId = result.id;
+      const userId = result.id;
 
-      const accessToken = fastify.jwt.superAdminAccess.sign({
-        superAdminId,
+      const accessToken = fastify.jwt.userAccess.sign({
+        userId,
       });
 
-      const refreshToken = fastify.jwt.superAdminRefresh.sign({
-        superAdminId,
+      const refreshToken = fastify.jwt.userRefresh.sign({
+        userId,
       });
 
       const accessTokenHash = getSha256Hash(accessToken);
@@ -104,19 +104,19 @@ export function POST(fastify: FastifyInstance) {
 
       const { set } = createRedisFunctions(fastify.redis);
 
-      const accessTokenKey = getSuperAdminAccessTokenKey(
-        superAdminId,
+      const accessTokenKey = getUserAccessTokenKey(
+        userId,
         accessTokenHash,
       );
-      const refreshTokenKey = getSuperAdminRefreshTokenKey(
-        superAdminId,
+      const refreshTokenKey = getUserRefreshTokenKey(
+        userId,
         refreshTokenHash,
       );
 
       const accessTokenExpiry
-        = parse(fastify.config.SUPER_ADMIN_ACCESS_JWT_EXPIRES_IN) ?? 0;
+        = parse(fastify.config.USER_ACCESS_JWT_EXPIRES_IN) ?? 0;
       const refreshTokenExpiry
-        = parse(fastify.config.SUPER_ADMIN_REFRESH_JWT_EXPIRES_IN) ?? 0;
+        = parse(fastify.config.USER_REFRESH_JWT_EXPIRES_IN) ?? 0;
 
       await set(accessTokenKey, accessToken, accessTokenExpiry);
       await set(refreshTokenKey, refreshToken, refreshTokenExpiry);
@@ -131,12 +131,12 @@ export function POST(fastify: FastifyInstance) {
         data: {
           ...result,
           password: undefined,
-          accessToken: `${superAdminId}:${accessTokenHash}`,
-          refreshToken: `${superAdminId}:${refreshTokenHash}`,
+          accessToken: `${userId}:${accessTokenHash}`,
+          refreshToken: `${userId}:${refreshTokenHash}`,
         },
       });
     },
-    schema: superAdminSignInSchema,
+    schema: userSignInSchema,
   };
 }
 // #endregion POST

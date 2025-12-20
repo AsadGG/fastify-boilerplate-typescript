@@ -6,32 +6,12 @@ export function swaggerConfig(): SwaggerOptions {
     openapi: {
       components: {
         securitySchemes: {
-          AuthorizationOfficeUserAccess: {
+          AuthorizationUserAccess: {
             type: 'apiKey',
             in: 'header',
             name: 'Authorization',
           },
-          AuthorizationOfficeUserRefresh: {
-            type: 'apiKey',
-            in: 'header',
-            name: 'Authorization',
-          },
-          AuthorizationSuperAdminAccess: {
-            type: 'apiKey',
-            in: 'header',
-            name: 'Authorization',
-          },
-          AuthorizationSuperAdminRefresh: {
-            type: 'apiKey',
-            in: 'header',
-            name: 'Authorization',
-          },
-          AuthorizationTenantAdminAccess: {
-            type: 'apiKey',
-            in: 'header',
-            name: 'Authorization',
-          },
-          AuthorizationTenantAdminRefresh: {
+          AuthorizationUserRefresh: {
             type: 'apiKey',
             in: 'header',
             name: 'Authorization',

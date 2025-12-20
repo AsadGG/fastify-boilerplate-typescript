@@ -21,21 +21,6 @@ export interface File {
   url: string;
 }
 
-export interface KeyValueStore {
-  expiresAt: Timestamp | null;
-  key: string;
-  value: string;
-}
-
-export interface SuperAdmin {
-  id: Generated<string>;
-  imageFileId: string | null;
-  email: string;
-  name: string;
-  password: string;
-  phone: string;
-}
-
 export interface Todo {
   id: Generated<string>;
   completed: Generated<boolean>;
@@ -46,9 +31,20 @@ export interface Todo {
   updatedAt: Generated<Timestamp>;
 }
 
+export interface User {
+  id: Generated<string>;
+  imageFileId: string | null;
+  deletedAt: Timestamp | null;
+  email: string;
+  name: string;
+  password: string;
+  phone: string;
+  createdAt: Generated<Timestamp>;
+  updatedAt: Generated<Timestamp>;
+}
+
 export interface DB {
   file: File;
-  keyValueStore: KeyValueStore;
-  superAdmin: SuperAdmin;
   todo: Todo;
+  user: User;
 }

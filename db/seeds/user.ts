@@ -7,7 +7,7 @@ export async function seed(database: Kysely<DB>) {
   const password = await bcrypt.hash('12345678', salt);
 
   await database
-    .insertInto('superAdmin')
+    .insertInto('user')
     .values({
       email: 'asad@admin.com',
       name: 'Asad',

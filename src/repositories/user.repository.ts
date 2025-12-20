@@ -5,34 +5,34 @@ import { promiseHandler } from '#utilities/promise-handler';
 import createError from '@fastify/error';
 import { fileJsonExpression } from './query-helpers';
 
-const SuperAdminIdNotFoundError = createError(
-  'APP_SUPER_ADMIN_ID_NOT_FOUND',
-  'super admin with id \'%s\' does not exist',
+const UserIdNotFoundError = createError(
+  'APP_USER_ID_NOT_FOUND',
+  'User with id \'%s\' does not exist',
   HTTP_STATUS.NOT_FOUND,
 );
 
-const SuperAdminEmailNotFoundError = createError(
-  'APP_SUPER_ADMIN_EMAIL_NOT_FOUND',
-  'Super admin with email \'%s\' does not exist',
+const UserEmailNotFoundError = createError(
+  'APP_USER_EMAIL_NOT_FOUND',
+  'User with email \'%s\' does not exist',
   HTTP_STATUS.NOT_FOUND,
 );
 
-export async function getSuperAdminById(
+export async function getUserById(
   kysely: Kysely<DB>,
   data: {
     id: string;
   },
 ) {
   const promise = kysely
-    .selectFrom('superAdmin')
-    .where('superAdmin.id', '=', data.id)
-    .leftJoin('file', 'file.id', 'superAdmin.id')
+    .selectFrom('user')
+    .where('user.id', '=', data.id)
+    .leftJoin('file', 'file.id', 'user.id')
     .select(eb => [
-      'superAdmin.email',
-      'superAdmin.id',
-      'superAdmin.name',
-      'superAdmin.password',
-      'superAdmin.phone',
+      'user.email',
+      'user.id',
+      'user.name',
+      'user.password',
+      'user.phone',
       fileJsonExpression(eb).as('image'),
     ])
     .executeTakeFirst();
@@ -44,28 +44,28 @@ export async function getSuperAdminById(
   }
 
   if (!result) {
-    throw new SuperAdminIdNotFoundError(data.id);
+    throw new UserIdNotFoundError(data.id);
   }
 
   return result;
 }
 
-export async function getSuperAdminByEmail(
+export async function getUserByEmail(
   kysely: Kysely<DB>,
   data: {
     email: string;
   },
 ) {
   const promise = kysely
-    .selectFrom('superAdmin')
-    .where('superAdmin.email', '=', data.email)
-    .leftJoin('file', 'file.id', 'superAdmin.imageFileId')
+    .selectFrom('user')
+    .where('user.email', '=', data.email)
+    .leftJoin('file', 'file.id', 'user.imageFileId')
     .select(eb => [
-      'superAdmin.email',
-      'superAdmin.id',
-      'superAdmin.name',
-      'superAdmin.password',
-      'superAdmin.phone',
+      'user.email',
+      'user.id',
+      'user.name',
+      'user.password',
+      'user.phone',
       fileJsonExpression(eb).as('image'),
     ])
     .executeTakeFirst();
@@ -77,7 +77,7 @@ export async function getSuperAdminByEmail(
   }
 
   if (!result) {
-    throw new SuperAdminEmailNotFoundError(data.email);
+    throw new UserEmailNotFoundError(data.email);
   }
 
   return result;

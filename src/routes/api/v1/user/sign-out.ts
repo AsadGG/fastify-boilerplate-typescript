@@ -5,12 +5,12 @@ import {
 } from '#schemas/common.schema';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { createRedisFunctions } from '#utilities/redis-helpers';
-import { getSuperAdminKeysPattern } from '#utilities/redis-keys';
+import { getUserKeysPattern } from '#utilities/redis-keys';
 
 // #region POST
-const superAdminSignOutSchema = {
-  operationId: 'superAdminSignOut',
-  description: 'this will sign out super admin',
+const userSignOutSchema = {
+  operationId: 'userSignOut',
+  description: 'this will sign out user',
   response: {
     [HTTP_STATUS.OK]: EmptyResponseSchema(
       HTTP_STATUS.OK,
@@ -23,33 +23,33 @@ const superAdminSignOutSchema = {
       'Authorization token expired',
     ),
   },
-  security: [{ AuthorizationSuperAdminAccess: [] }],
-  summary: 'sign out super admin',
-  tags: ['v1|super admin'],
+  security: [{ AuthorizationUserAccess: [] }],
+  summary: 'sign out user',
+  tags: ['v1|user'],
 };
 export function POST(fastify: FastifyInstance) {
   return {
     async handler(
-      request: FastifyRequest & { user: { superAdminId: string } },
+      request: FastifyRequest & { user: { userId: string } },
       reply: FastifyReply,
     ) {
-      const { superAdminId } = request.user;
+      const { userId } = request.user;
 
       const { del, keys } = createRedisFunctions(fastify.redis);
 
-      const pattern = getSuperAdminKeysPattern(superAdminId);
+      const pattern = getUserKeysPattern(userId);
 
-      const superAdminKeys = await keys(pattern);
+      const userKeys = await keys(pattern);
 
-      await del(superAdminKeys);
+      await del(userKeys);
 
       return reply.status(HTTP_STATUS.OK).send({
         statusCode: HTTP_STATUS.OK,
         message: 'signed out successfully.',
       });
     },
-    onRequest: [fastify.authenticateSuperAdminAccess],
-    schema: superAdminSignOutSchema,
+    onRequest: [fastify.authenticateUserAccess],
+    schema: userSignOutSchema,
   };
 }
 // #endregion POST
