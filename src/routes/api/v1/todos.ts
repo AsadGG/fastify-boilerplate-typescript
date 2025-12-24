@@ -81,10 +81,6 @@ const createTodosSchema = {
   description: 'This will create todo',
   body: PostSchemaBody,
   response: {
-    [HTTP_STATUS.CONFLICT]: EmptyResponseSchema(
-      HTTP_STATUS.CONFLICT,
-      'Record already exists',
-    ),
     [HTTP_STATUS.CREATED]: ResponseSchema(
       Type.Object({
         id: Type.String({ format: 'uuid' }),
@@ -94,6 +90,11 @@ const createTodosSchema = {
       HTTP_STATUS.CREATED,
       'Record created successfully.',
     ),
+    [HTTP_STATUS.CONFLICT]: EmptyResponseSchema(
+      HTTP_STATUS.CONFLICT,
+      'Record already exists',
+    ),
+
   },
 };
 export function POST(fastify: FastifyInstance) {

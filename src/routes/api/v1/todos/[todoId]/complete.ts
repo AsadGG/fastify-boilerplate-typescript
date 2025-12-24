@@ -21,10 +21,6 @@ const completeTodoSchema = {
   description: 'This will mark todo as complete',
   params: PatchSchemaParameters,
   response: {
-    [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
-      HTTP_STATUS.NOT_FOUND,
-      'Record does not exist',
-    ),
     [HTTP_STATUS.OK]: ResponseSchema(
       Type.Object({
         id: Type.String({ format: 'uuid' }),
@@ -33,6 +29,10 @@ const completeTodoSchema = {
       }),
       HTTP_STATUS.OK,
       'Record marked as complete',
+    ),
+    [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
+      HTTP_STATUS.NOT_FOUND,
+      'Record does not exist',
     ),
   },
 };

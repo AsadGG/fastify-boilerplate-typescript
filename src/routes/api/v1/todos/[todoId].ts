@@ -25,10 +25,6 @@ const fetchTodoSchema = {
   description: 'This will fetch todo',
   params: GetSchemaParameters,
   response: {
-    [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
-      HTTP_STATUS.NOT_FOUND,
-      'Record does not exist',
-    ),
     [HTTP_STATUS.OK]: ResponseSchema(
       Type.Object({
         id: Type.String({ format: 'uuid' }),
@@ -36,6 +32,10 @@ const fetchTodoSchema = {
         task: Type.String(),
       }),
       HTTP_STATUS.OK,
+    ),
+    [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
+      HTTP_STATUS.NOT_FOUND,
+      'Record does not exist',
     ),
   },
 };
@@ -89,14 +89,6 @@ const updateTodoSchema = {
   params: PatchSchemaParameters,
   body: PatchSchemaBody,
   response: {
-    [HTTP_STATUS.CONFLICT]: EmptyResponseSchema(
-      HTTP_STATUS.CONFLICT,
-      'Record already exists',
-    ),
-    [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
-      HTTP_STATUS.NOT_FOUND,
-      'Record does not exist',
-    ),
     [HTTP_STATUS.OK]: ResponseSchema(
       Type.Object({
         id: Type.String({ format: 'uuid' }),
@@ -104,6 +96,14 @@ const updateTodoSchema = {
         task: Type.String(),
       }),
       HTTP_STATUS.OK,
+    ),
+    [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
+      HTTP_STATUS.NOT_FOUND,
+      'Record does not exist',
+    ),
+    [HTTP_STATUS.CONFLICT]: EmptyResponseSchema(
+      HTTP_STATUS.CONFLICT,
+      'Record already exists',
     ),
   },
 };
@@ -153,16 +153,16 @@ const deleteTodoSchema = {
   description: 'This will delete todo',
   params: DeleteSchemaParameters,
   response: {
-    [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
-      HTTP_STATUS.NOT_FOUND,
-      'Record does not exist',
-    ),
     [HTTP_STATUS.OK]: ResponseSchema(
       Type.Object({
         id: Type.String({ format: 'uuid' }),
       }),
       HTTP_STATUS.OK,
       'Record deleted successfully.',
+    ),
+    [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
+      HTTP_STATUS.NOT_FOUND,
+      'Record does not exist',
     ),
   },
 };

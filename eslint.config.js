@@ -7,8 +7,11 @@ const schemaGroups = ['operationId', 'tags', 'hide', 'summary', 'description', '
 const responseCustomGroups = { statusCode: '^statusCode$', message: '^message$', data: '^data$', pagination: '^pagination$', accessToken: '^accessToken$', refreshToken: '^refreshToken$', createdAt: '^createdAt$', updatedAt: '^updatedAt$' };
 const responseGroups = ['statusCode', 'message', 'data', 'pagination', 'unknown', 'accessToken', 'refreshToken', 'createdAt', 'updatedAt'];
 
-const customGroups = { id: '[Ii]d$', index: '^index$', ...schemaCustomGroups, ...responseCustomGroups, default: '^default$', enum: '^enum$', ref: '^ref$', required: '^required$', type: '^type$', unique: '^unique$' };
-const groups = ['id', 'index', ...schemaGroups, ...responseGroups];
+const responseSchemaCustomGroups = { OK: 'OK$', CREATED: 'CREATED$', UNAUTHORIZED: 'UNAUTHORIZED$', NOT_FOUND: 'NOT_FOUND$', CONFLICT: 'CONFLICT$' };
+const responseSchemaGroups = ['OK', 'CREATED', 'UNAUTHORIZED', 'NOT_FOUND', 'CONFLICT'];
+
+const customGroups = { id: '[Ii]d$', index: '^index$', ...schemaCustomGroups, ...responseSchemaCustomGroups, ...responseCustomGroups, default: '^default$', enum: '^enum$', ref: '^ref$', required: '^required$', type: '^type$', unique: '^unique$' };
+const groups = ['id', 'index', ...schemaGroups, ...responseSchemaGroups, ...responseGroups];
 
 export default antfu(
   {
