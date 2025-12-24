@@ -6,14 +6,14 @@ import { Type } from '@sinclair/typebox';
 export const PaginationQuerySchema = Type.Object(
   {
     page: Type.Integer({
+      description: 'Page number (starts from 1)',
       default: 1,
-      description: 'page number (starts from 1)',
       examples: [1],
       minimum: 1,
     }),
     size: Type.Integer({
+      description: 'Number of records per page',
       default: 10,
-      description: 'number of records per page',
       examples: [10],
       minimum: 1,
     }),
@@ -26,7 +26,7 @@ export const SearchQuerySchema = Type.Object(
     search: Type.Optional(
       Type.String({
         description:
-          'search term to filter results (applied to supported fields)',
+          'Search term to filter results (applied to supported fields)',
       }),
     ),
   },
@@ -35,27 +35,27 @@ export const SearchQuerySchema = Type.Object(
 export const PaginationMetaSchema = Type.Object(
   {
     currentPage: Type.Number({
-      description: 'current page number',
+      description: 'Current page number',
       examples: [2],
     }),
     lastPage: Type.Number({
-      description: 'total number of pages (last available page)',
+      description: 'Total number of pages (last available page)',
       examples: [3],
     }),
     nextPage: Type.Union([Type.Number(), Type.Null()], {
-      description: 'next page number if available, otherwise null',
+      description: 'Next page number if available, otherwise null',
       examples: [3, null],
     }),
     perPage: Type.Number({
-      description: 'number of records per page',
+      description: 'Number of records per page',
       examples: [10],
     }),
     prevPage: Type.Union([Type.Number(), Type.Null()], {
-      description: 'previous page number if available, otherwise null',
+      description: 'Previous page number if available, otherwise null',
       examples: [1, null],
     }),
     total: Type.Number({
-      description: 'total number of records',
+      description: 'Total number of records',
       examples: [30],
     }),
   },
@@ -65,7 +65,7 @@ export const PaginationMetaSchema = Type.Object(
 export function PaginatedResponseSchema<T extends TSchema>(
   schema: T,
   statusCode: HttpStatusCode = HTTP_STATUS.OK,
-  message: string = 'records fetched successfully.',
+  message = 'Records fetched successfully.',
 ) {
   return Type.Object(
     {
@@ -81,7 +81,7 @@ export function PaginatedResponseSchema<T extends TSchema>(
 export function ResponseSchema<T extends TSchema>(
   schema: T,
   statusCode: HttpStatusCode = 200,
-  message: string = 'record fetched successfully.',
+  message = 'Record fetched successfully.',
 ) {
   return Type.Object(
     {
@@ -95,7 +95,7 @@ export function ResponseSchema<T extends TSchema>(
 
 export function EmptyResponseSchema(
   statusCode: HttpStatusCode = 200,
-  message: string = 'action performed successfully.',
+  message = 'Action performed successfully.',
 ) {
   return Type.Object(
     {
@@ -108,25 +108,25 @@ export function EmptyResponseSchema(
 
 export function ErrorResponseSchema(
   statusCode: HttpStatusCode = 400,
-  code: string = 'FST_ERROR',
-  error: string = 'Bad Request',
-  message: string = 'Invalid input provided.',
+  code = 'FST_ERROR',
+  error = 'Bad Request',
+  message = 'Invalid input provided.',
 ) {
   return Type.Object(
     {
       statusCode: Type.Literal(statusCode, {
-        description: 'http status code of the error response',
+        description: 'Http status code of the error response',
       }),
       message: Type.String({
-        description: 'detailed human-readable error message',
+        description: 'Detailed human-readable error message',
         examples: [message],
       }),
       code: Type.String({
-        description: 'application or framework-specific error code',
+        description: 'Application or framework-specific error code',
         examples: [code],
       }),
       error: Type.String({
-        description: 'short error label or type',
+        description: 'Short error label or type',
         examples: [error],
       }),
     },

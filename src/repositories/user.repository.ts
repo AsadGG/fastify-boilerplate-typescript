@@ -1,21 +1,8 @@
 import type { DB } from '#src/types/database';
 import type { Kysely } from 'kysely';
-import HTTP_STATUS from '#utilities/http-status-codes';
+import { UserEmailNotFoundError, UserIdNotFoundError } from '#src/errors/user';
 import { promiseHandler } from '#utilities/promise-handler';
-import createError from '@fastify/error';
 import { fileJsonExpression } from './query-helpers';
-
-const UserIdNotFoundError = createError(
-  'APP_USER_ID_NOT_FOUND',
-  'User with id \'%s\' does not exist',
-  HTTP_STATUS.NOT_FOUND,
-);
-
-const UserEmailNotFoundError = createError(
-  'APP_USER_EMAIL_NOT_FOUND',
-  'User with email \'%s\' does not exist',
-  HTTP_STATUS.NOT_FOUND,
-);
 
 export async function getUserById(
   kysely: Kysely<DB>,

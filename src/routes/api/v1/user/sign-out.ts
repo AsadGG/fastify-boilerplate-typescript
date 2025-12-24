@@ -1,4 +1,5 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import type { AuthenticatedFastifyRequest } from '#src/types/fastify';
+import type { FastifyInstance, FastifyReply } from 'fastify';
 import {
   EmptyResponseSchema,
   ErrorResponseSchema,
@@ -10,11 +11,14 @@ import { getUserKeysPattern } from '#utilities/redis-keys';
 // #region POST
 const userSignOutSchema = {
   operationId: 'userSignOut',
-  description: 'this will sign out user',
+  tags: ['v1|user'],
+  summary: 'Sign out user',
+  description: 'This will sign out user',
+  security: [{ AuthorizationUserAccess: [] }],
   response: {
     [HTTP_STATUS.OK]: EmptyResponseSchema(
       HTTP_STATUS.OK,
-      'signed out successfully.',
+      'Signed out successfully.',
     ),
     [HTTP_STATUS.UNAUTHORIZED]: ErrorResponseSchema(
       HTTP_STATUS.UNAUTHORIZED,
@@ -23,14 +27,11 @@ const userSignOutSchema = {
       'Authorization token expired',
     ),
   },
-  security: [{ AuthorizationUserAccess: [] }],
-  summary: 'sign out user',
-  tags: ['v1|user'],
 };
 export function POST(fastify: FastifyInstance) {
   return {
     async handler(
-      request: FastifyRequest & { user: { userId: string } },
+      request: AuthenticatedFastifyRequest,
       reply: FastifyReply,
     ) {
       const { userId } = request.user;
@@ -45,7 +46,7 @@ export function POST(fastify: FastifyInstance) {
 
       return reply.status(HTTP_STATUS.OK).send({
         statusCode: HTTP_STATUS.OK,
-        message: 'signed out successfully.',
+        message: 'Signed out successfully.',
       });
     },
     onRequest: [fastify.authenticateUserAccess],

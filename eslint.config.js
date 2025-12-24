@@ -1,8 +1,14 @@
 import antfu from '@antfu/eslint-config';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 
-const customGroups = { id: '[Ii]d$', index: '^index$', type: '^type$', enum: '^enum$', ref: '^ref$', default: '^default$', required: '^required$', unique: '^unique$', statusCode: '^statusCode$', message: '^message$', data: '^data$', pagination: '^pagination$', accessToken: '^accessToken$', refreshToken: '^refreshToken$', createdAt: '^createdAt$', updatedAt: '^updatedAt$' };
-const groups = ['id', 'index', 'type', 'enum', 'ref', 'default', 'required', 'unique', 'statusCode', 'message', 'data', 'pagination', 'unknown', 'accessToken', 'refreshToken', 'createdAt', 'updatedAt'];
+const schemaCustomGroups = { operationId: '^operationId$', tags: '^tags$', hide: '^hide$', summary: '^summary$', description: '^description$', security: '^security$', consumes: '^consumes$', headers: '^headers$', params: '^params$', querystring: '^querystring$', body: '^body$', response: '^response$' };
+const schemaGroups = ['operationId', 'tags', 'hide', 'summary', 'description', 'security', 'consumes', 'headers', 'params', 'querystring', 'body', 'response'];
+
+const responseCustomGroups = { statusCode: '^statusCode$', message: '^message$', data: '^data$', pagination: '^pagination$', accessToken: '^accessToken$', refreshToken: '^refreshToken$', createdAt: '^createdAt$', updatedAt: '^updatedAt$' };
+const responseGroups = ['statusCode', 'message', 'data', 'pagination', 'unknown', 'accessToken', 'refreshToken', 'createdAt', 'updatedAt'];
+
+const customGroups = { id: '[Ii]d$', index: '^index$', ...schemaCustomGroups, ...responseCustomGroups, default: '^default$', enum: '^enum$', ref: '^ref$', required: '^required$', type: '^type$', unique: '^unique$' };
+const groups = ['id', 'index', ...schemaGroups, ...responseGroups];
 
 export default antfu(
   {
@@ -25,39 +31,39 @@ export default antfu(
       'perfectionist/sort-interfaces': [
         'warn',
         {
-          type: 'natural',
           customGroups,
           groups,
           order: 'asc',
           partitionByComment: true,
+          type: 'natural',
         },
       ],
       'perfectionist/sort-object-types': [
         'warn',
         {
-          type: 'natural',
           customGroups,
           groups,
           order: 'asc',
           partitionByComment: true,
+          type: 'natural',
         },
       ],
       'perfectionist/sort-objects': [
         'warn',
         {
-          type: 'natural',
           customGroups,
           groups,
           order: 'asc',
           partitionByComment: true,
+          type: 'natural',
         },
       ],
       'perfectionist/sort-union-types': [
         'warn',
         {
-          type: 'natural',
           groups: ['unknown', 'nullish'],
           order: 'asc',
+          type: 'natural',
         },
       ],
       'unicorn/consistent-function-scoping': 'off',

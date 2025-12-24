@@ -17,7 +17,7 @@ const NUMBERS_AND_LETTERS = NUMBERS + UPPERCASE_LETTERS + LOWERCASE_LETTERS;
 export function generateOtp(length = 6, unique = false): string {
   if (unique && length > NUMBERS_AND_UPPERCASE_LETTERS.length) {
     throw new Error(
-      `length can not be greater than ${NUMBERS_AND_UPPERCASE_LETTERS.length}`,
+      `Length can not be greater than ${NUMBERS_AND_UPPERCASE_LETTERS.length}`,
     );
   }
 

@@ -3,6 +3,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { getUserByEmail } from '#repositories/user.repository';
 import { EmptyResponseSchema, ResponseSchema } from '#schemas/common.schema';
 import { AuthenticateUserSchema } from '#schemas/user.schema';
+import { AuthenticationInvalidCredentialsError } from '#src/errors/authentication';
 import { getSha256Hash } from '#utilities/hash';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { promiseHandler } from '#utilities/promise-handler';
@@ -11,6 +12,7 @@ import {
   getUserAccessTokenKey,
   getUserRefreshTokenKey,
 } from '#utilities/redis-keys';
+import { sendError } from '#utilities/send-error';
 import { parse } from '@lukeed/ms';
 import { Type } from '@sinclair/typebox';
 
@@ -24,21 +26,21 @@ const PostSchemaBody = Type.Object(
 );
 const userSignInSchema = {
   operationId: 'userSignIn',
+  tags: ['v1|user'],
+  summary: 'Sign in user',
+  description: 'This will sign in user',
   body: PostSchemaBody,
-  description: 'this will sign in user',
   response: {
     [HTTP_STATUS.OK]: ResponseSchema(
       AuthenticateUserSchema,
       HTTP_STATUS.OK,
-      'signed in successfully.',
+      'Signed in successfully.',
     ),
     [HTTP_STATUS.UNAUTHORIZED]: EmptyResponseSchema(
       HTTP_STATUS.UNAUTHORIZED,
-      'invalid credentials.',
+      'Invalid credentials.',
     ),
   },
-  summary: 'sign in user',
-  tags: ['v1|user'],
 };
 export function POST(fastify: FastifyInstance) {
   return {
@@ -54,22 +56,15 @@ export function POST(fastify: FastifyInstance) {
       const promise = getUserByEmail(fastify.kysely, data);
       const [error, result, ok] = await promiseHandler(promise);
       if (!ok) {
-        const statusCode
-          = error.statusCode === HTTP_STATUS.NOT_FOUND
-            ? HTTP_STATUS.UNAUTHORIZED
-            : HTTP_STATUS.INTERNAL_SERVER_ERROR;
-        const errorObject = {
-          statusCode,
-          message:
-            error.statusCode === HTTP_STATUS.NOT_FOUND
-              ? `invalid credentials.`
-              : `something went wrong.`,
-        };
-        request.log.error({
-          error,
-          payload: data,
-        });
-        return reply.status(statusCode).send(errorObject);
+        error.statusCode === HTTP_STATUS.NOT_FOUND
+          ? error.statusCode = HTTP_STATUS.UNAUTHORIZED
+          : error.statusCode = HTTP_STATUS.INTERNAL_SERVER_ERROR;
+
+        error.statusCode === HTTP_STATUS.NOT_FOUND
+          ? error.message = 'Invalid credentials.'
+          : error.message = 'Something went wrong.';
+
+        return sendError(request, reply, error, data);
       }
 
       const isPasswordMatch = await fastify.bcrypt.compare(
@@ -78,15 +73,7 @@ export function POST(fastify: FastifyInstance) {
       );
 
       if (!isPasswordMatch) {
-        const errorObject = {
-          statusCode: HTTP_STATUS.UNAUTHORIZED,
-          message: `invalid credentials.`,
-        };
-        request.log.error({
-          error,
-          payload: data,
-        });
-        return reply.status(HTTP_STATUS.UNAUTHORIZED).send(errorObject);
+        return sendError(request, reply, new AuthenticationInvalidCredentialsError(), data);
       }
 
       const userId = result.id;
@@ -127,7 +114,7 @@ export function POST(fastify: FastifyInstance) {
 
       return reply.status(HTTP_STATUS.OK).send({
         statusCode: HTTP_STATUS.OK,
-        message: 'signed in successfully.',
+        message: 'Signed in successfully.',
         data: {
           ...result,
           password: undefined,

@@ -7,14 +7,14 @@ export function swaggerConfig(): SwaggerOptions {
       components: {
         securitySchemes: {
           AuthorizationUserAccess: {
-            type: 'apiKey',
             in: 'header',
             name: 'Authorization',
+            type: 'apiKey',
           },
           AuthorizationUserRefresh: {
-            type: 'apiKey',
             in: 'header',
             name: 'Authorization',
+            type: 'apiKey',
           },
         },
       },

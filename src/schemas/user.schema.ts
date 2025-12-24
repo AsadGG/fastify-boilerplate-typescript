@@ -3,10 +3,10 @@ import { Type } from '@sinclair/typebox';
 export const UserSchema = Type.Object(
   {
     id: Type.String({
-      description: 'unique identifier of the user',
+      description: 'Unique identifier of the user',
       format: 'uuid',
     }),
-    email: Type.String({ description: 'email address', format: 'email' }),
+    email: Type.String({ description: 'Email address', format: 'email' }),
     image: Type.Union([
       Type.Object({
         filename: Type.String({ examples: ['profile-picture.png'] }),
@@ -17,11 +17,11 @@ export const UserSchema = Type.Object(
       Type.Null(),
     ]),
     name: Type.String({
-      description: 'full name of the user',
+      description: 'Full name of the user',
       examples: ['John Doe'],
     }),
     phone: Type.String({
-      description: 'phone number',
+      description: 'Phone number',
       examples: ['03001234567'],
     }),
   },
@@ -32,13 +32,13 @@ export const AuthenticateUserSchema = Type.Composite([
   UserSchema,
   Type.Object({
     accessToken: Type.String({
-      description: 'access token used for authentication',
+      description: 'Access token used for authentication',
       examples: [
         '01234567-89ab-4cde-8f01-23456789abcd:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
       ],
     }),
     refreshToken: Type.String({
-      description: 'refresh token used to obtain new access tokens',
+      description: 'Refresh token used to obtain new access tokens',
       examples: [
         '01234567-89ab-4cde-8f01-23456789abcd:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
       ],

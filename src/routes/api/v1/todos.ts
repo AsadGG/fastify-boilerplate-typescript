@@ -10,6 +10,7 @@ import {
 } from '#schemas/common.schema';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { promiseHandler } from '#utilities/promise-handler';
+import { sendError } from '#utilities/send-error';
 import { Type } from '@sinclair/typebox';
 
 // #region GET
@@ -19,7 +20,9 @@ const GetSchemaQuerystring = Type.Composite(
 );
 const fetchTodosSchema = {
   operationId: 'getTodos',
-  description: 'this will fetch todos',
+  tags: ['v1|todos'],
+  summary: 'Fetch todos',
+  description: 'This will fetch todos',
   querystring: GetSchemaQuerystring,
   response: {
     [HTTP_STATUS.OK]: PaginatedResponseSchema(
@@ -31,8 +34,6 @@ const fetchTodosSchema = {
       HTTP_STATUS.OK,
     ),
   },
-  summary: 'fetch todos',
-  tags: ['v1|todos'],
 };
 export function GET(fastify: FastifyInstance) {
   return {
@@ -52,21 +53,11 @@ export function GET(fastify: FastifyInstance) {
       const [error, result, ok] = await promiseHandler(promise);
 
       if (!ok) {
-        const statusCode
-          = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
-        const errorObject = {
-          statusCode,
-          message: error.message,
-        };
-        request.log.error({
-          error,
-          payload: data,
-        });
-        return reply.status(statusCode).send(errorObject);
+        return sendError(request, reply, error, data);
       }
       return reply.status(HTTP_STATUS.OK).send({
         statusCode: HTTP_STATUS.OK,
-        message: 'todos fetched successfully.',
+        message: 'Todos fetched successfully.',
         data: result.records,
         pagination: result.pagination,
       });
@@ -85,12 +76,14 @@ const PostSchemaBody = Type.Object(
 );
 const createTodosSchema = {
   operationId: 'createTodo',
+  tags: ['v1|todos'],
+  summary: 'Create todo',
+  description: 'This will create todo',
   body: PostSchemaBody,
-  description: 'this will create todo',
   response: {
     [HTTP_STATUS.CONFLICT]: EmptyResponseSchema(
       HTTP_STATUS.CONFLICT,
-      'record already exists',
+      'Record already exists',
     ),
     [HTTP_STATUS.CREATED]: ResponseSchema(
       Type.Object({
@@ -99,11 +92,9 @@ const createTodosSchema = {
         task: Type.String(),
       }),
       HTTP_STATUS.CREATED,
-      'record created successfully.',
+      'Record created successfully.',
     ),
   },
-  summary: 'create todo',
-  tags: ['v1|todos'],
 };
 export function POST(fastify: FastifyInstance) {
   return {
@@ -121,21 +112,11 @@ export function POST(fastify: FastifyInstance) {
       const [error, result, ok] = await promiseHandler(promise);
 
       if (!ok) {
-        const statusCode
-          = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
-        const errorObject = {
-          statusCode,
-          message: error.message,
-        };
-        request.log.error({
-          error,
-          payload: data,
-        });
-        return reply.status(statusCode).send(errorObject);
+        return sendError(request, reply, error, data);
       }
       return reply.status(HTTP_STATUS.CREATED).send({
         statusCode: HTTP_STATUS.CREATED,
-        message: 'todo created successfully.',
+        message: 'Todo created successfully.',
         data: result.record,
       });
     },

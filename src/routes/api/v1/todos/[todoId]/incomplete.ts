@@ -4,6 +4,7 @@ import { updateTodoCompletionById } from '#repositories/todo.repository';
 import { EmptyResponseSchema, ResponseSchema } from '#schemas/common.schema';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { promiseHandler } from '#utilities/promise-handler';
+import { sendError } from '#utilities/send-error';
 import { Type } from '@sinclair/typebox';
 
 // #region PATCH
@@ -15,12 +16,14 @@ const PatchSchemaParameters = Type.Object(
 );
 const incompleteTodoSchema = {
   operationId: 'incompleteTodo',
-  description: 'this will mark todo as incomplete',
+  tags: ['v1|todos'],
+  summary: 'Mark todo as incomplete',
+  description: 'This will mark todo as incomplete',
   params: PatchSchemaParameters,
   response: {
     [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
       HTTP_STATUS.NOT_FOUND,
-      'record does not exist',
+      'Record does not exist',
     ),
     [HTTP_STATUS.OK]: ResponseSchema(
       Type.Object({
@@ -29,11 +32,9 @@ const incompleteTodoSchema = {
         task: Type.String(),
       }),
       HTTP_STATUS.OK,
-      'record marked as incomplete',
+      'Record marked as incomplete',
     ),
   },
-  summary: 'mark todo as incomplete',
-  tags: ['v1|todos'],
 };
 export function PATCH(fastify: FastifyInstance) {
   return {
@@ -52,21 +53,11 @@ export function PATCH(fastify: FastifyInstance) {
       const [error, result, ok] = await promiseHandler(promise);
 
       if (!ok) {
-        const statusCode
-          = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
-        const errorObject = {
-          statusCode,
-          message: error.message,
-        };
-        request.log.error({
-          error,
-          payload: data,
-        });
-        return reply.status(statusCode).send(errorObject);
+        return sendError(request, reply, error, data);
       }
       return reply.status(HTTP_STATUS.OK).send({
         statusCode: HTTP_STATUS.OK,
-        message: 'todo marked as incomplete successfully.',
+        message: 'Todo marked as incomplete successfully.',
         data: result.record,
       });
     },

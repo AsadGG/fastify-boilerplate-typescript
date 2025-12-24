@@ -1,27 +1,14 @@
 import type { DB } from '#src/types/database';
 import type { Kysely } from 'kysely';
+import { TodoAlreadyExistsError, TodoIdNotFoundError } from '#src/errors/todo';
 import getConflicts from '#utilities/get-conflicts';
-import HTTP_STATUS from '#utilities/http-status-codes';
 import {
   getLimitAndOffset,
   getPaginationObject,
 } from '#utilities/pagination-helpers';
 import { POSTGRES_ERROR_CODES } from '#utilities/postgres_error_codes';
 import { promiseHandler } from '#utilities/promise-handler';
-import createError from '@fastify/error';
 import { sql } from 'kysely';
-
-const TodoIdNotFoundError = createError(
-  'APP_TODO_ID_NOT_FOUND',
-  'todo with id \'%s\' does not exist',
-  HTTP_STATUS.NOT_FOUND,
-);
-
-const TodoAlreadyExistsError = createError(
-  'APP_TODO_ALREADY_EXISTS',
-  'todo \'%s\' already exists',
-  HTTP_STATUS.CONFLICT,
-);
 
 export async function getTodos(
   kysely: Kysely<DB>,

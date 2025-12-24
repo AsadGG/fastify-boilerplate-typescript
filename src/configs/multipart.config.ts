@@ -6,13 +6,13 @@ export function multipartConfig(): FastifyMultipartAttachFieldsToBodyOptions {
     async onFile(part: any) {
       const buffer = await part.toBuffer();
       part.value = {
-        type: part.type,
         buffer,
         encoding: part.encoding,
         fieldname: part.fieldname,
         filename: part.filename,
         mimetype: part.mimetype,
         size: buffer.length,
+        type: part.type,
       };
     },
   };

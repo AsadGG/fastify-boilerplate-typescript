@@ -8,6 +8,7 @@ import {
 import { EmptyResponseSchema, ResponseSchema } from '#schemas/common.schema';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { promiseHandler } from '#utilities/promise-handler';
+import { sendError } from '#utilities/send-error';
 import { Type } from '@sinclair/typebox';
 
 // #region GET
@@ -19,12 +20,14 @@ const GetSchemaParameters = Type.Object(
 );
 const fetchTodoSchema = {
   operationId: 'getTodo',
-  description: 'this will fetch todo',
+  tags: ['v1|todos'],
+  summary: 'Fetch todo',
+  description: 'This will fetch todo',
   params: GetSchemaParameters,
   response: {
     [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
       HTTP_STATUS.NOT_FOUND,
-      'record does not exist',
+      'Record does not exist',
     ),
     [HTTP_STATUS.OK]: ResponseSchema(
       Type.Object({
@@ -35,8 +38,6 @@ const fetchTodoSchema = {
       HTTP_STATUS.OK,
     ),
   },
-  summary: 'fetch todo',
-  tags: ['v1|todos'],
 };
 export function GET(fastify: FastifyInstance) {
   return {
@@ -54,21 +55,11 @@ export function GET(fastify: FastifyInstance) {
       const [error, result, ok] = await promiseHandler(promise);
 
       if (!ok) {
-        const statusCode
-          = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
-        const errorObject = {
-          statusCode,
-          message: error.message,
-        };
-        request.log.error({
-          error,
-          payload: data,
-        });
-        return reply.status(statusCode).send(errorObject);
+        return sendError(request, reply, error, data);
       }
       return reply.status(HTTP_STATUS.OK).send({
         statusCode: HTTP_STATUS.OK,
-        message: 'todo fetched successfully.',
+        message: 'Todo fetched successfully.',
         data: result.record,
       });
     },
@@ -92,17 +83,19 @@ const PatchSchemaBody = Type.Object(
 );
 const updateTodoSchema = {
   operationId: 'updateTodo',
-  body: PatchSchemaBody,
-  description: 'this will update todo',
+  tags: ['v1|todos'],
+  summary: 'Update todo',
+  description: 'This will update todo',
   params: PatchSchemaParameters,
+  body: PatchSchemaBody,
   response: {
     [HTTP_STATUS.CONFLICT]: EmptyResponseSchema(
       HTTP_STATUS.CONFLICT,
-      'record already exists',
+      'Record already exists',
     ),
     [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
       HTTP_STATUS.NOT_FOUND,
-      'record does not exist',
+      'Record does not exist',
     ),
     [HTTP_STATUS.OK]: ResponseSchema(
       Type.Object({
@@ -113,8 +106,6 @@ const updateTodoSchema = {
       HTTP_STATUS.OK,
     ),
   },
-  summary: 'update todo',
-  tags: ['v1|todos'],
 };
 export function PATCH(fastify: FastifyInstance) {
   return {
@@ -134,21 +125,11 @@ export function PATCH(fastify: FastifyInstance) {
       const [error, result, ok] = await promiseHandler(promise);
 
       if (!ok) {
-        const statusCode
-          = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
-        const errorObject = {
-          statusCode,
-          message: error.message,
-        };
-        request.log.error({
-          error,
-          payload: data,
-        });
-        return reply.status(statusCode).send(errorObject);
+        return sendError(request, reply, error, data);
       }
       return reply.status(HTTP_STATUS.OK).send({
         statusCode: HTTP_STATUS.OK,
-        message: 'todo updated successfully.',
+        message: 'Todo updated successfully.',
         data: result.record,
       });
     },
@@ -167,23 +148,23 @@ const DeleteSchemaParameters = Type.Object(
 
 const deleteTodoSchema = {
   operationId: 'deleteTodo',
-  description: 'this will delete todo',
+  tags: ['v1|todos'],
+  summary: 'Delete todo',
+  description: 'This will delete todo',
   params: DeleteSchemaParameters,
   response: {
     [HTTP_STATUS.NOT_FOUND]: EmptyResponseSchema(
       HTTP_STATUS.NOT_FOUND,
-      'record does not exist',
+      'Record does not exist',
     ),
     [HTTP_STATUS.OK]: ResponseSchema(
       Type.Object({
         id: Type.String({ format: 'uuid' }),
       }),
       HTTP_STATUS.OK,
-      'record deleted successfully.',
+      'Record deleted successfully.',
     ),
   },
-  summary: 'delete todo',
-  tags: ['v1|todos'],
 };
 export function DELETE(fastify: FastifyInstance) {
   return {
@@ -201,21 +182,11 @@ export function DELETE(fastify: FastifyInstance) {
       const [error, result, ok] = await promiseHandler(promise);
 
       if (!ok) {
-        const statusCode
-          = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
-        const errorObject = {
-          statusCode,
-          message: error.message,
-        };
-        request.log.error({
-          error,
-          payload: data,
-        });
-        return reply.status(statusCode).send(errorObject);
+        return sendError(request, reply, error, data);
       }
       return reply.status(HTTP_STATUS.OK).send({
         statusCode: HTTP_STATUS.OK,
-        message: 'todo deleted successfully.',
+        message: 'Todo deleted successfully.',
         data: result.record,
       });
     },

@@ -8,6 +8,7 @@ import { ResponseSchema } from '#schemas/common.schema';
 import HTTP_STATUS from '#utilities/http-status-codes';
 import { promiseHandler } from '#utilities/promise-handler';
 import { randomUuidV7 } from '#utilities/random-uuid-v7';
+import { sendError } from '#utilities/send-error';
 import { Type } from '@sinclair/typebox';
 
 function resolveUploadDirectory(mimetype: string): string {
@@ -55,9 +56,11 @@ const PostSchemaBody = Type.Object(
 );
 const uploadFileSchema = {
   operationId: 'uploadFile',
-  body: PostSchemaBody,
+  tags: ['upload file'],
+  summary: 'Upload file',
+  description: 'This will upload file',
   consumes: ['multipart/form-data'],
-  description: 'this will upload file',
+  body: PostSchemaBody,
   response: {
     [HTTP_STATUS.CREATED]: ResponseSchema(
       Type.Object({
@@ -68,11 +71,9 @@ const uploadFileSchema = {
         url: Type.String(),
       }),
       HTTP_STATUS.CREATED,
-      'file uploaded successfully.',
+      'File uploaded successfully.',
     ),
   },
-  summary: 'upload file',
-  tags: ['upload file'],
 };
 export function POST(fastify: FastifyInstance) {
   return {
@@ -115,22 +116,12 @@ export function POST(fastify: FastifyInstance) {
       const [error, result, ok] = await promiseHandler(promise);
 
       if (!ok) {
-        const statusCode
-          = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
-        const errorObject = {
-          statusCode,
-          message: error.message,
-        };
-        request.log.error({
-          error,
-          payload: data,
-        });
-        return reply.status(statusCode).send(errorObject);
+        return sendError(request, reply, error, data);
       }
 
       return reply.status(HTTP_STATUS.CREATED).send({
         statusCode: HTTP_STATUS.CREATED,
-        message: 'file uploaded successfully.',
+        message: 'File uploaded successfully.',
         data: {
           ...result.record,
           url: `${fastify.config.WEB_SERVER_BASE_URL}${url}`,

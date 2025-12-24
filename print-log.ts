@@ -23,7 +23,7 @@ const loggerTypes = [
 ];
 
 const loggerType = await select({
-  message: 'Select A Logger Type',
+  message: 'Select a logger type',
   choices: [
     { name: 'all', value: '' },
     ...loggerTypes.map(loggerType => ({
@@ -51,7 +51,7 @@ const logFilesObjectPromise = logFiles
 const logFilesObject = await Promise.all(logFilesObjectPromise);
 
 const filePath = await select({
-  message: 'Select A Log File',
+  message: 'Select a log file',
   choices: logFilesObject.map(logFile => ({
     name: logFile.name,
     value: logFile.path,

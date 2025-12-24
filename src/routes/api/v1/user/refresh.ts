@@ -1,4 +1,5 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import type { AuthenticatedFastifyRequest } from '#src/types/fastify';
+import type { FastifyInstance, FastifyReply } from 'fastify';
 import { getUserById } from '#repositories/user.repository';
 import { ErrorResponseSchema, ResponseSchema } from '#schemas/common.schema';
 import { AuthenticateUserSchema } from '#schemas/user.schema';
@@ -10,12 +11,16 @@ import {
   getUserAccessTokenKey,
   getUserRefreshTokenKey,
 } from '#utilities/redis-keys';
+import { sendError } from '#utilities/send-error';
 import { parse } from '@lukeed/ms';
 
 // #region POST
 const userSignInSchema = {
   operationId: 'userRefresh',
-  description: 'this will refresh user tokens',
+  tags: ['v1|user'],
+  summary: 'User refresh',
+  description: 'This will refresh user tokens',
+  security: [{ AuthorizationUserRefresh: [] }],
   response: {
     [HTTP_STATUS.OK]: ResponseSchema(
       AuthenticateUserSchema,
@@ -29,14 +34,11 @@ const userSignInSchema = {
       'Authorization token expired',
     ),
   },
-  security: [{ AuthorizationUserRefresh: [] }],
-  summary: 'user refresh',
-  tags: ['v1|user'],
 };
 export function POST(fastify: FastifyInstance) {
   return {
     async handler(
-      request: FastifyRequest & { user: { userId: string } },
+      request: AuthenticatedFastifyRequest,
       reply: FastifyReply,
     ) {
       const data = {
@@ -46,17 +48,7 @@ export function POST(fastify: FastifyInstance) {
       const promise = getUserById(fastify.kysely, data);
       const [error, result, ok] = await promiseHandler(promise);
       if (!ok) {
-        const statusCode
-          = error.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
-        const errorObject = {
-          statusCode,
-          message: error.message,
-        };
-        request.log.error({
-          error,
-          payload: data,
-        });
-        return reply.status(statusCode).send(errorObject);
+        return sendError(request, reply, error, data);
       }
 
       const userId = result.id;
@@ -96,7 +88,7 @@ export function POST(fastify: FastifyInstance) {
 
       return reply.status(HTTP_STATUS.OK).send({
         statusCode: HTTP_STATUS.OK,
-        message: 'token refreshed successfully.',
+        message: 'Token refreshed successfully.',
         data: {
           ...result,
           password: undefined,
